@@ -1755,6 +1755,11 @@ function collectBounds(ast) {
         const rect = getLogicalPlacementRect(nodePoint.x, nodePoint.y, boxMetrics.width, boxMetrics.height, command.placementAnchor);
         includePoint(bounds, rect.x, rect.y);
         includePoint(bounds, rect.x + rect.width, rect.y + rect.height);
+      } else if (command.placementAnchor) {
+        const textMetrics = measureText(command.text, nodeFont.fontSize / UNIT_SCALE);
+        const rect = getLogicalPlacementRect(nodePoint.x, nodePoint.y, textMetrics.width, textMetrics.height, command.placementAnchor);
+        includePoint(bounds, rect.x, rect.y);
+        includePoint(bounds, rect.x + rect.width, rect.y + rect.height);
       } else if (textOnlyDirectional) {
         const textMetrics = measureText(command.text, nodeFont.fontSize / UNIT_SCALE);
         const rect = getAnchoredRect(nodePoint.x, nodePoint.y, textMetrics.width, textMetrics.height, textLayout.textAnchor, textLayout.dominantBaseline);
@@ -1815,6 +1820,11 @@ function collectBounds(ast) {
 
         if (style.stroke !== "none" || style.fill !== "none") {
           const rect = getLogicalPlacementRect(nodePoint.x, nodePoint.y, boxMetrics.width, boxMetrics.height, operation.placementAnchor);
+          includePoint(bounds, rect.x, rect.y);
+          includePoint(bounds, rect.x + rect.width, rect.y + rect.height);
+        } else if (operation.placementAnchor) {
+          const textMetrics = measureText(operation.text, nodeFont.fontSize / UNIT_SCALE);
+          const rect = getLogicalPlacementRect(nodePoint.x, nodePoint.y, textMetrics.width, textMetrics.height, operation.placementAnchor);
           includePoint(bounds, rect.x, rect.y);
           includePoint(bounds, rect.x + rect.width, rect.y + rect.height);
         } else if (textOnlyDirectional) {
@@ -2302,6 +2312,11 @@ function renderNodeCommand(command, bounds, padding, parentCommand = null) {
     x = textCenter.x;
     y = textCenter.y;
     boxElement = renderNodeShape(command, rect, style, strokeWidth);
+  } else if (command.placementAnchor) {
+    const textMetrics = measureText(command.text, nodeFont.fontSize);
+    const rect = getPlacementRect(x, y, textMetrics.width, textMetrics.height, command.placementAnchor);
+    x = rect.x + rect.width / 2;
+    y = rect.y + rect.height / 2;
   }
 
   const baseline = boxElement ? 'central' : textLayout.dominantBaseline;
