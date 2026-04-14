@@ -1,0 +1,22 @@
+[
+  {
+    "file": "closed-path.tikz",
+    "name": "Closed Path",
+    "features": ["cycle", "node-above"]
+  },
+  {
+    "file": "orthogonal-route.tikz",
+    "name": "Orthogonal Route",
+    "features": ["|-", "-|", "arrow"]
+  },
+  {
+    "file": "curved-link.tikz",
+    "name": "Curved Link",
+    "features": ["curve", "bidirectional-arrow", "node-above"]
+  },
+  {
+    "file": "rectangle-marker.tikz",
+    "name": "Rectangle Marker",
+    "features": ["rectangle", "circle", "node-below"]
+  }
+]

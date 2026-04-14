@@ -1,0 +1,12 @@
+\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (-2,-1) circle (0.08) node[above right] {\footnotesize (\raisebox{0.8pt}{-}2,\raisebox{0.8pt}{-}1)};
+  \draw[fill=black] (0,0) circle (0.08) node[above right] {\footnotesize (0,0)};
+  \draw[fill=black] (1,2) circle (0.08) node[above right] {\footnotesize (1,2)};
+\end{tikzpicture}

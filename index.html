@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>tikz.js Demo</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f1ea;
+        color: #1f1d1a;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+
+      h1 {
+        margin-bottom: 12px;
+        font-size: 42px;
+      }
+
+      p {
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 28px;
+      }
+
+      .card {
+        padding: 18px;
+        border: 1px solid #d9d0c3;
+        border-radius: 16px;
+        background: #fffaf2;
+        box-shadow: 0 12px 30px rgba(74, 56, 33, 0.08);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .comparisonPane {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .comparisonLabel {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #6a604f;
+      }
+
+      .tikz {
+        display: block;
+        min-height: 120px;
+        padding: 12px;
+        border-radius: 12px;
+        background: white;
+        overflow: auto;
+      }
+
+      .referenceView {
+        display: block;
+        min-height: 120px;
+        padding: 12px;
+        border-radius: 12px;
+        background: white;
+        overflow: auto;
+      }
+
+      .referenceView img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .referenceMissing {
+        padding: 12px;
+        border-radius: 12px;
+        background: #f8f3eb;
+        color: #6d5b49;
+        font-size: 14px;
+      }
+
+      pre {
+        margin: 14px 0 0;
+        padding: 12px;
+        border-radius: 12px;
+        background: #f5efe4;
+        color: #3c3326;
+        overflow: auto;
+        font: 13px/1.5 "SFMono-Regular", Menlo, Consolas, monospace;
+      }
+
+      code {
+        background: rgba(65, 54, 42, 0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+
+      @media (max-width: 760px) {
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>tikz.js</h1>
+      <p>Any block element with <code>class="tikz"</code> is parsed on page load and replaced with inline SVG.</p>
+
+      <div class="grid">
+        <section class="card" data-reference="closed-path">
+          <h2>Closed Path</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[line width=0.08, color=#3a6ea5] (0,0) -- (2,0) -- (1.5,1.5) -- (0.4,2.2) -- cycle;
+  \node[color=#17324d] at (1,2.7) {Facet};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[line width=0.08, color=#3a6ea5] (0,0) -- (2,0) -- (1.5,1.5) -- (0.4,2.2) -- cycle;
+  \node[color=#17324d] at (1,2.7) {Facet};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="rectangle-marker">
+          <h2>Rectangle And Circle</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[draw=#6b5b95, line width=0.06] (0,0) rectangle (3,2);
+  \fill[fill=#ff7f50, opacity=0.8] (1.5,1) circle (0.45);
+  \node[color=#3f2a1d] at (1.5,2.5) {Marker};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[draw=#6b5b95, line width=0.06] (0,0) rectangle (3,2);
+  \fill[fill=#ff7f50, opacity=0.8] (1.5,1) circle (0.45);
+  \node[color=#3f2a1d] at (1.5,2.5) {Marker};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="dashed-line">
+          <h2>Dashed Line</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[dashed, color=#1b9aaa, line width=0.05] (0,0) -- (1,1.4) -- (2.4,0.2);
+  \node[color=#0c4f59] at (1.2,1.9) {Route};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[dashed, color=#1b9aaa, line width=0.05] (0,0) -- (1,1.4) -- (2.4,0.2);
+  \node[color=#0c4f59] at (1.2,1.9) {Route};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="arrow-curve">
+          <h2>Arrow Curve</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[->, color=#7c3aed, line width=0.06] (0,0) .. controls (0.7,1.8) and (2.2,1.8) .. (3,0.3);
+  \node[color=#4c1d95] at (1.5,2.3) {Flow};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[->, color=#7c3aed, line width=0.06] (0,0) .. controls (0.7,1.8) and (2.2,1.8) .. (3,0.3);
+  \node[color=#4c1d95] at (1.5,2.3) {Flow};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="bidirectional-arc">
+          <h2>Bidirectional Arc</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[<->, color=#dc2626, line width=0.05] (0,0.2) .. controls (1,1.6) and (2,1.6) .. (3,0.2);
+  \node[color=#7f1d1d] at (1.5,1.9) {Link};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[<->, color=#dc2626, line width=0.05] (0,0.2) .. controls (1,1.6) and (2,1.6) .. (3,0.2);
+  \node[color=#7f1d1d] at (1.5,1.9) {Link};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="orthogonal-route">
+          <h2>Orthogonal Connector</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[->, color=#0f766e, line width=0.05] (0,0) |- (2,1.4) -| (3.2,0.4);
+  \node[right, color=#115e59] at (3.2,0.4) {Route};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[->, color=#0f766e, line width=0.05] (0,0) |- (2,1.4) -| (3.2,0.4);
+  \node[right, color=#115e59] at (3.2,0.4) {Route};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="circle-label">
+          <h2>Circle And Edge Label</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw circle(0.5);
+  \draw (-0.5,0) to ["text"] (0.5,0);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw circle(0.5);
+  \draw (-0.5,0) to ["text"] (0.5,0);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="axis-labels">
+          <h2>Axis Labels</h2>
+          <div class="tikz">
+\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (-2,-1) circle (0.08) node[above right] {\footnotesize (\raisebox{0.8pt}{-}2,\raisebox{0.8pt}{-}1)};
+  \draw[fill=black] (0,0) circle (0.08) node[above right] {\footnotesize (0,0)};
+  \draw[fill=black] (1,2) circle (0.08) node[above right] {\footnotesize (1,2)};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (-2,-1) circle (0.08) node[above right] {\footnotesize (\raisebox{0.8pt}{-}2,\raisebox{0.8pt}{-}1)};
+  \draw[fill=black] (0,0) circle (0.08) node[above right] {\footnotesize (0,0)};
+  \draw[fill=black] (1,2) circle (0.08) node[above right] {\footnotesize (1,2)};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="blue-square">
+          <h2>Blue Square</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) -- (-2,2)
+  -- (2,2) -- (2,-2) -- cycle;
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) -- (-2,2)
+  -- (2,2) -- (2,-2) -- cycle;
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="blue-circles">
+          <h2>Blue Circles</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) circle (1) (-2,2)
+    circle (1) (2,2) circle (1) (2,-2) circle (1);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) circle (1) (-2,2)
+    circle (1) (2,2) circle (1) (2,-2) circle (1);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="polar-coordinates">
+          <h2>Polar Coordinates</h2>
+          <div class="tikz">
+\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] circle (1) circle (2) circle (3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (60:2) circle (0.08)   node[below right] {(60:2)};
+  \draw [fill=blue!15](0,0) -- (1,0) arc (0:60:1cm);
+  \draw[fill=black] circle (0.08) node[above left] {(0:0)}
+    node [above right,xshift=0.2cm] {60${}^\circ$};
+  \draw [dashed](0,0) -- (60:2);
+  \draw [dashed](1,0) -- (60:2);
+  \draw[fill=black] (20:2) circle (0.08)   node[below right] {(20:2)};
+  \draw[fill=black] (180:3) circle (0.08)   node[above right] {(180:3)};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] circle (1) circle (2) circle (3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (60:2) circle (0.08)   node[below right] {(60:2)};
+  \draw [fill=blue!15](0,0) -- (1,0) arc (0:60:1cm);
+  \draw[fill=black] circle (0.08) node[above left] {(0:0)}
+    node [above right,xshift=0.2cm] {60${}^\circ$};
+  \draw [dashed](0,0) -- (60:2);
+  \draw [dashed](1,0) -- (60:2);
+  \draw[fill=black] (20:2) circle (0.08)   node[below right] {(20:2)};
+  \draw[fill=black] (180:3) circle (0.08)   node[above right] {(180:3)};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="polar-hexagon">
+          <h2>Polar Hexagon</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw (-3,0) -- (3,0);
+  \draw (0,-3) -- (0,3);
+  \draw[very thick, blue] (0:2) -- (60:2) -- (120:2)
+    -- (180:2) --(240:2) -- (300:2) -- cycle;
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw (-3,0) -- (3,0);
+  \draw (0,-3) -- (0,3);
+  \draw[very thick, blue] (0:2) -- (60:2) -- (120:2)
+    -- (180:2) --(240:2) -- (300:2) -- cycle;
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="projected-axes">
+          <h2>Projected Axes</h2>
+          <div class="tikz">
+\begin{tikzpicture}[y={(-0.86cm,0.5cm)},x={(0.86cm,0.5cm)}, z={(0cm,1cm)},font=\sffamily]
+  \draw[very thick, blue] (-2,-2,0) -- (-2,2,0) -- (2,2,0) -- (2,-2,0) -- cycle;
+  \draw[->] (0,0,0) -- (2.5, 0,  0) node [right] {x};
+  \draw[->] (0,0,0) -- (0,  2.5, 0) node [left] {y};
+  \draw[->,dashed] (0,0,0) -- (0,  0, 2.5) node [above] {z};
+  \draw circle (2);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}[y={(-0.86cm,0.5cm)},x={(0.86cm,0.5cm)}, z={(0cm,1cm)},font=\sffamily]
+  \draw[very thick, blue] (-2,-2,0) -- (-2,2,0) -- (2,2,0) -- (2,-2,0) -- cycle;
+  \draw[->] (0,0,0) -- (2.5, 0,  0) node [right] {x};
+  \draw[->] (0,0,0) -- (0,  2.5, 0) node [left] {y};
+  \draw[->,dashed] (0,0,0) -- (0,  0, 2.5) node [above] {z};
+  \draw circle (2);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="relative-plus">
+          <h2>Relative Plus</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- +(1,0) -- +(2,2) -- +(4,2) -- +(5,0) -- + (6,0);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- +(1,0) -- +(2,2) -- +(4,2) -- +(5,0) -- + (6,0);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="relative-double-plus">
+          <h2>Relative Double Plus</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- ++(1,0) -- ++(1,2) -- ++(2,0) -- ++(1,-2) -- ++(1,0);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- ++(1,0) -- ++(1,2) -- ++(2,0) -- ++(1,-2) -- ++(1,0);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="option-shapes">
+          <h2>Option Shapes</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw (0,0) circle [radius=2];
+  \draw (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw (0.5,0.5) ellipse [x radius=0.2, y radius=0.4];
+  \draw (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+  \draw (-3,-3) rectangle (3,3);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw (0,0) circle [radius=2];
+  \draw (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw (0.5,0.5) ellipse [x radius=0.2, y radius=0.4];
+  \draw (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+  \draw (-3,-3) rectangle (3,3);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="filled-face">
+          <h2>Filled Face</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[fill=yellow] (0,0) circle [radius=2];
+  \draw[fill=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[fill=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[fill=yellow] (0,0) circle [radius=2];
+  \draw[fill=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[fill=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="shaded-face">
+          <h2>Shaded Face</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[shading=ball, ball color=yellow] (0,0) circle [radius=2];
+  \draw[shading=ball, ball color=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[shading=ball, ball color=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[shading=ball, ball color=yellow] (0,0) circle [radius=2];
+  \draw[shading=ball, ball color=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[shading=ball, ball color=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="styled-node">
+          <h2>Styled Node</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw (4,2) node[draw, color=red, fill=yellow, text=blue] {TikZ};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw (4,2) node[draw, color=red, fill=yellow, text=blue] {TikZ};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="node-shapes">
+          <h2>Node Shapes</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="node-connections">
+          <h2>Node Connections</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+  \draw[->] (r.east)  -- (e.west);
+  \draw[->] (r.south) -- (c.north west);
+  \draw[->] (e.south) -- (c.north east);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+  \draw[->] (r.east)  -- (e.west);
+  \draw[->] (r.south) -- (c.north west);
+  \draw[->] (e.south) -- (c.north east);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="anchored-node-placement">
+          <h2>Anchored Node Placement</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle, anchor=south west]
+    {rectangle};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle, anchor=south west]
+    {rectangle};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="centered-node-placement">
+          <h2>Centered Node Placement</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle] {rectangle};
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle] {rectangle};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="node-anchor-demo">
+          <h2>Node Anchor Demo</h2>
+          <div class="tikz">
+\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=1.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=rectangle,shape example]
+    {\Huge rectan\smash{g}le\hspace{3cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 45/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above, south east/below, south west/below, north west/above}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}
+          </div>
+          <pre>\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=1.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=rectangle,shape example]
+    {\Huge rectan\smash{g}le\hspace{3cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 45/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above, south east/below, south west/below, north west/above}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="circle-anchor-demo">
+          <h2>Circle Anchor Demo</h2>
+          <div class="tikz">
+\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=0.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=circle,shape example] {\Huge circle\hspace{2cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 30/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above right, south east/below right, south west/below left,
+         north west/above left}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}
+          </div>
+          <pre>\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=0.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=circle,shape example] {\Huge circle\hspace{2cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 30/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above right, south east/below right, south west/below left,
+         north west/above left}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card">
+          <h2>Error State</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+  \draw (0,0) .. (1,1);
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+  \draw (0,0) .. (1,1);
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="matrix-shapes">
+          <h2>Matrix Shapes</h2>
+          <div class="tikz">
+\begin{tikzpicture}
+    \matrix[nodes={draw, fill=blue!15},
+        row sep=0.2cm, column sep=0.3cm,
+        nodes={font=\sffamily}] {
+    \node[rectangle split, rectangle split parts=2] {rectangle \nodepart{two} split};&
+    \node[circle split] {circle \nodepart{lower} split}; &
+    \node[semicircle] {semicircle};&
+    \node[circular sector, align=center] {circular\\sector};&
+    \\
+    \node[forbidden sign,text width=4em, text centered]
+                    {forbidden sign};&
+    \node[dart] {dart};&
+    \node[kite] {kite};&
+    \node[isosceles triangle, align=center] {isosceles\\triangle};&
+                    \\
+    \node[diamond] {diamond};&
+    \node[regular polygon, regular polygon sides=5, align=center]
+      {regular\\polygon\\(5 sides)};&
+    \node[regular polygon, regular polygon sides=6, align=center]
+      {regular\\polygon\\(6 sides)};&
+    \node[regular polygon, regular polygon sides=8, align=center]
+      {regular\\polygon\\(8 sides)};\\
+    \node[trapezium] {trapezium};&
+    \node[cloud] {cloud};&
+    \node[star] {star};&
+    \node[starburst] {starburst};&
+    \\
+    \node[cylinder] {cylinder};&
+    \node[signal] {signal};&
+    \node[tape] {tape};&
+    \node[magnetic tape, align=center] {magnetic\\tape};&
+    \\
+    };
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}
+    \matrix[nodes={draw, fill=blue!15},
+        row sep=0.2cm, column sep=0.3cm,
+        nodes={font=\sffamily}] {
+    \node[rectangle split, rectangle split parts=2] {rectangle \nodepart{two} split};&
+    \node[circle split] {circle \nodepart{lower} split}; &
+    \node[semicircle] {semicircle};&
+    \node[circular sector, align=center] {circular\\sector};&
+    \\
+    \node[forbidden sign,text width=4em, text centered]
+                    {forbidden sign};&
+    \node[dart] {dart};&
+    \node[kite] {kite};&
+    \node[isosceles triangle, align=center] {isosceles\\triangle};&
+                    \\
+    \node[diamond] {diamond};&
+    \node[regular polygon, regular polygon sides=5, align=center]
+      {regular\\polygon\\(5 sides)};&
+    \node[regular polygon, regular polygon sides=6, align=center]
+      {regular\\polygon\\(6 sides)};&
+    \node[regular polygon, regular polygon sides=8, align=center]
+      {regular\\polygon\\(8 sides)};\\
+    \node[trapezium] {trapezium};&
+    \node[cloud] {cloud};&
+    \node[star] {star};&
+    \node[starburst] {starburst};&
+    \\
+    \node[cylinder] {cylinder};&
+    \node[signal] {signal};&
+    \node[tape] {tape};&
+    \node[magnetic tape, align=center] {magnetic\\tape};&
+    \\
+    };
+\end{tikzpicture}</pre>
+        </section>
+      </div>
+    </main>
+
+    <script src="dist/tikz.js"></script>
+    <script>
+      for (const card of document.querySelectorAll(".card[data-reference]")) {
+        const tikzElement = card.querySelector(".tikz");
+        if (!tikzElement) {
+          continue;
+        }
+
+        const comparison = document.createElement("div");
+        comparison.className = "comparison";
+
+        const generatedPane = document.createElement("div");
+        generatedPane.className = "comparisonPane";
+        generatedPane.innerHTML = '<div class="comparisonLabel">Generated</div>';
+        generatedPane.appendChild(tikzElement);
+
+        const referencePane = document.createElement("div");
+        referencePane.className = "comparisonPane";
+        referencePane.innerHTML = '<div class="comparisonLabel">LaTeX Reference</div>';
+
+        const referenceView = document.createElement("div");
+        referenceView.className = "referenceView";
+
+        const image = document.createElement("img");
+        image.src = 'artifacts/latex-verify/' + card.dataset.reference + '/reference.svg';
+        image.alt = card.querySelector("h2") ? card.querySelector("h2").textContent + ' reference SVG' : 'reference SVG';
+        image.addEventListener("error", function () {
+          referenceView.innerHTML = '<div class="referenceMissing">Reference SVG unavailable.</div>';
+        }, { once: true });
+        referenceView.appendChild(image);
+        referencePane.appendChild(referenceView);
+
+        comparison.appendChild(generatedPane);
+        comparison.appendChild(referencePane);
+
+        card.insertBefore(comparison, card.querySelector("pre"));
+      }
+    </script>
+  </body>
+  </html>

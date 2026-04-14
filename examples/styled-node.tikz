@@ -1,0 +1,3 @@
+\begin{tikzpicture}
+  \draw (4,2) node[draw, color=red, fill=yellow, text=blue] {TikZ};
+\end{tikzpicture}

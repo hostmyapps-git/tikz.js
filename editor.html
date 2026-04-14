@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>tikz.js Editor</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(180deg, #f3f8ff 0%, #edf2f7 100%);
+        color: #132238;
+      }
+
+      main {
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      .shell {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 40px;
+      }
+
+      p {
+        margin: 0 0 24px;
+        line-height: 1.6;
+        color: #38506b;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+        gap: 20px;
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(61, 92, 128, 0.16);
+        border-radius: 20px;
+        box-shadow: 0 18px 50px rgba(45, 76, 112, 0.12);
+        overflow: hidden;
+      }
+
+      .panelHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid rgba(61, 92, 128, 0.12);
+        background: rgba(240, 246, 255, 0.95);
+      }
+
+      .panelHeader h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .hint {
+        font-size: 13px;
+        color: #5b718a;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 520px;
+        padding: 18px;
+        border: 0;
+        resize: vertical;
+        font: 14px/1.6 "SFMono-Regular", Menlo, Consolas, monospace;
+        color: #102033;
+        background: #fcfdff;
+      }
+
+      textarea:focus {
+        outline: 2px solid #5a8dee;
+        outline-offset: -2px;
+      }
+
+      .preview {
+        min-height: 520px;
+        padding: 18px;
+        background: radial-gradient(circle at top left, rgba(89, 145, 255, 0.08), transparent 32%), #ffffff;
+      }
+
+      .preview svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .status {
+        font-size: 13px;
+        color: #38506b;
+      }
+
+      .status[data-state="error"] {
+        color: #a62828;
+      }
+
+      .errorBox {
+        padding: 14px;
+        border: 1px solid #efb4b4;
+        border-radius: 12px;
+        background: #fff4f4;
+        color: #8c1d1d;
+        white-space: pre-wrap;
+        line-height: 1.5;
+      }
+
+      .samples {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 0 18px 18px;
+        background: rgba(240, 246, 255, 0.55);
+      }
+
+      button {
+        padding: 9px 12px;
+        border: 1px solid rgba(61, 92, 128, 0.18);
+        border-radius: 999px;
+        background: white;
+        color: #18324f;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      button:hover {
+        background: #f3f7fd;
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 840px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        textarea,
+        .preview {
+          min-height: 320px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="shell">
+        <h1>tikz.js Editor</h1>
+        <p>Type a small TikZ subset on the left and the SVG preview updates immediately on the right.</p>
+
+        <div class="layout">
+          <section class="panel">
+            <div class="panelHeader">
+              <h2>Source</h2>
+              <div class="hint">Live preview while typing</div>
+            </div>
+            <textarea id="tikzInput" spellcheck="false">\begin{tikzpicture}
+  \draw[->, color=#2563eb, line width=0.06] (0,0) .. controls (1,1.8) and (2.2,1.8) .. (3.2,0.2);
+  \draw[dashed, color=#0f766e] (0,0) -- (0.8,-0.6) -- (3.2,-0.2);
+  \fill[fill=#f97316, opacity=0.85] (1.6,0.55) circle (0.34);
+  \node[color=#1e3a8a] at (1.6,2.2) {Live};
+\end{tikzpicture}</textarea>
+            <div class="samples">
+              <button type="button" data-sample="polygon">Polygon</button>
+              <button type="button" data-sample="curve">Curve</button>
+              <button type="button" data-sample="rectangle">Rectangle</button>
+              <button type="button" data-sample="circleLabel">Circle Label</button>
+              <button type="button" data-sample="axis">Axis</button>
+              <button type="button" data-sample="blueSquare">Blue Square</button>
+              <button type="button" data-sample="blueCircles">Blue Circles</button>
+              <button type="button" data-sample="polar">Polar</button>
+              <button type="button" data-sample="hexagon">Hexagon</button>
+              <button type="button" data-sample="projected">Projected</button>
+              <button type="button" data-sample="relativePlus">Relative +</button>
+              <button type="button" data-sample="relativeDoublePlus">Relative ++</button>
+              <button type="button" data-sample="optionShapes">Option Shapes</button>
+              <button type="button" data-sample="filledFace">Filled Face</button>
+              <button type="button" data-sample="shadedFace">Shaded Face</button>
+              <button type="button" data-sample="styledNode">Styled Node</button>
+              <button type="button" data-sample="nodeShapes">Node Shapes</button>
+              <button type="button" data-sample="nodeConnections">Node Connections</button>
+              <button type="button" data-sample="anchoredNode">Anchored Node</button>
+              <button type="button" data-sample="centeredNode">Centered Node</button>
+              <button type="button" data-sample="nodeAnchorDemo">Node Anchor Demo</button>
+              <button type="button" data-sample="circleAnchorDemo">Circle Anchor Demo</button>
+              <button type="button" data-sample="matrixShapes">Matrix Shapes</button>
+              <button type="button" data-sample="invalid">Invalid</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panelHeader">
+              <h2>Preview</h2>
+              <div class="controls">
+                <button type="button" id="copySvgButton">Copy SVG</button>
+                <button type="button" id="downloadSvgButton">Download SVG</button>
+                <div id="status" class="status">Rendering...</div>
+              </div>
+            </div>
+            <div id="preview" class="preview"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="dist/tikz.js"></script>
+    <script>
+      const inputElement = document.getElementById("tikzInput");
+      const previewElement = document.getElementById("preview");
+      const statusElement = document.getElementById("status");
+      const sampleButtons = document.querySelectorAll("[data-sample]");
+      const copySvgButton = document.getElementById("copySvgButton");
+      const downloadSvgButton = document.getElementById("downloadSvgButton");
+      const storageKey = "tikz.js.editor.source";
+      let lastRenderedSvg = "";
+
+      const samples = {
+        polygon: String.raw`\begin{tikzpicture}
+  \draw[line width=0.07, color=#7c3aed] (0,0) -- (2.2,0.3) -- (2.8,1.6) -- (1.4,2.4) -- (0.1,1.6) -- cycle;
+  \node[color=#4c1d95] at (1.4,2.9) {Facet};
+\end{tikzpicture}`,
+        curve: String.raw`\begin{tikzpicture}
+  \draw[<->, color=#dc2626, line width=0.05] (0,0.2) .. controls (1,1.8) and (2,1.8) .. (3,0.2);
+  \fill[fill=#f59e0b] (1.5,0.9) circle (0.28);
+  \node[color=#7f1d1d] at (1.5,2.2) {Arc};
+\end{tikzpicture}`,
+        rectangle: String.raw`\begin{tikzpicture}
+  \draw[draw=#0f766e, line width=0.06] (0,0) rectangle (3,1.8);
+  \fill[fill=#14b8a6, opacity=0.4] (1.5,0.9) circle (0.42);
+  \node[color=#115e59] at (1.5,2.3) {Marker};
+\end{tikzpicture}`,
+        circleLabel: String.raw`\begin{tikzpicture}
+  \draw circle(0.5);
+  \draw (-0.5,0) to ["text"] (0.5,0);
+\end{tikzpicture}`,
+        axis: String.raw`\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (-2,-1) circle (0.08) node[above right] {\footnotesize (\raisebox{0.8pt}{-}2,\raisebox{0.8pt}{-}1)};
+  \draw[fill=black] (0,0) circle (0.08) node[above right] {\footnotesize (0,0)};
+  \draw[fill=black] (1,2) circle (0.08) node[above right] {\footnotesize (1,2)};
+\end{tikzpicture}`,
+        blueSquare: String.raw`\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) -- (-2,2)
+  -- (2,2) -- (2,-2) -- cycle;
+\end{tikzpicture}`,
+        blueCircles: String.raw`\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-2,-2) circle (1) (-2,2)
+    circle (1) (2,2) circle (1) (2,-2) circle (1);
+\end{tikzpicture}`,
+        polar: String.raw`\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] circle (1) circle (2) circle (3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (60:2) circle (0.08)   node[below right] {(60:2)};
+  \draw [fill=blue!15](0,0) -- (1,0) arc (0:60:1cm);
+  \draw[fill=black] circle (0.08) node[above left] {(0:0)}
+    node [above right,xshift=0.2cm] {60\${}^\circ$};
+  \draw [dashed](0,0) -- (60:2);
+  \draw [dashed](1,0) -- (60:2);
+  \draw[fill=black] (20:2) circle (0.08)   node[below right] {(20:2)};
+  \draw[fill=black] (180:3) circle (0.08)   node[above right] {(180:3)};
+\end{tikzpicture}`,
+        hexagon: String.raw`\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw (-3,0) -- (3,0);
+  \draw (0,-3) -- (0,3);
+  \draw[very thick, blue] (0:2) -- (60:2) -- (120:2)
+    -- (180:2) --(240:2) -- (300:2) -- cycle;
+\end{tikzpicture}`,
+        projected: String.raw`\begin{tikzpicture}[y={(-0.86cm,0.5cm)},x={(0.86cm,0.5cm)}, z={(0cm,1cm)},font=\sffamily]
+  \draw[very thick, blue] (-2,-2,0) -- (-2,2,0) -- (2,2,0) -- (2,-2,0) -- cycle;
+  \draw[->] (0,0,0) -- (2.5, 0,  0) node [right] {x};
+  \draw[->] (0,0,0) -- (0,  2.5, 0) node [left] {y};
+  \draw[->,dashed] (0,0,0) -- (0,  0, 2.5) node [above] {z};
+  \draw circle (2);
+\end{tikzpicture}`,
+        relativePlus: String.raw`\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- +(1,0) -- +(2,2) -- +(4,2) -- +(5,0) -- + (6,0);
+\end{tikzpicture}`,
+        relativeDoublePlus: String.raw`\begin{tikzpicture}
+  \draw[thin,dotted] (-3,-3) grid (3,3);
+  \draw[->] (-3,0) -- (3,0);
+  \draw[->] (0,-3) -- (0,3);
+  \draw[very thick, blue] (-3,-1) -- ++(1,0) -- ++(1,2) -- ++(2,0) -- ++(1,-2) -- ++(1,0);
+\end{tikzpicture}`,
+        optionShapes: String.raw`\begin{tikzpicture}
+  \draw (0,0) circle [radius=2];
+  \draw (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw (0.5,0.5) ellipse [x radius=0.2, y radius=0.4];
+  \draw (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+  \draw (-3,-3) rectangle (3,3);
+\end{tikzpicture}`,
+        filledFace: String.raw`\begin{tikzpicture}
+  \draw[fill=yellow] (0,0) circle [radius=2];
+  \draw[fill=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[fill=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}`,
+        shadedFace: String.raw`\begin{tikzpicture}
+  \draw[shading=ball, ball color=yellow] (0,0) circle [radius=2];
+  \draw[shading=ball, ball color=black] (-0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[shading=ball, ball color=black] (0.5,0.5,0) ellipse [x radius=0.2, y radius=0.4];
+  \draw[very thick] (-1,-1) arc [start angle=185, end angle=355,
+    x radius=1, y radius=0.5];
+\end{tikzpicture}`,
+        styledNode: String.raw`\begin{tikzpicture}
+  \draw (4,2) node[draw, color=red, fill=yellow, text=blue] {TikZ};
+\end{tikzpicture}`,
+        nodeShapes: String.raw`\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+\end{tikzpicture}`,
+        nodeConnections: String.raw`\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+  \draw[->] (r.east)  -- (e.west);
+  \draw[->] (r.south) -- (c.north west);
+  \draw[->] (e.south) -- (c.north east);
+\end{tikzpicture}`,
+        anchoredNode: String.raw`\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle, anchor=south west]
+    {rectangle};
+\end{tikzpicture}`,
+        centeredNode: String.raw`\begin{tikzpicture}
+  \draw[fill=red] (4,2) circle[radius=0.1];
+  \node at (4,2) [draw, rectangle] {rectangle};
+\end{tikzpicture}`,
+        nodeAnchorDemo: String.raw`\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=1.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=rectangle,shape example]
+    {\Huge rectan\smash{g}le\hspace{3cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 45/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above, south east/below, south west/below, north west/above}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}`,
+        circleAnchorDemo: String.raw`\tikzset{shape example/.style = {
+    color=black!50, draw, fill=blue!10,
+    inner xsep=0.5cm, inner ysep=0.5cm,
+}}
+\begin{tikzpicture}[node distance = 1mm]
+  \node[name=n,shape=circle,shape example] {\Huge circle\hspace{2cm}node};
+  \foreach \anchor/\placement in
+    {center/above, text/below, 30/above right,
+       mid/right, mid east/right, mid west/left,
+       base/below, base east/below right, base west/below left,
+       north/above, south/below, east/above right, west/above left,
+       north east/above right, south east/below right, south west/below left,
+         north west/above left}
+      \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
+        node[\placement,label distance = 0mm,inner sep=3pt]
+          {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}`,
+        matrixShapes: String.raw`\begin{tikzpicture}
+    \matrix[nodes={draw, fill=blue!15},
+        row sep=0.2cm, column sep=0.3cm,
+        nodes={font=\sffamily}] {
+    \node[rectangle split, rectangle split parts=2] {rectangle \nodepart{two} split};&
+    \node[circle split] {circle \nodepart{lower} split}; &
+    \node[semicircle] {semicircle};&
+    \node[circular sector, align=center] {circular\\sector};&
+    \\
+    \node[forbidden sign,text width=4em, text centered]
+                    {forbidden sign};&
+    \node[dart] {dart};&
+    \node[kite] {kite};&
+    \node[isosceles triangle, align=center] {isosceles\\triangle};&
+                    \\
+    \node[diamond] {diamond};&
+    \node[regular polygon, regular polygon sides=5, align=center]
+      {regular\\polygon\\(5 sides)};&
+    \node[regular polygon, regular polygon sides=6, align=center]
+      {regular\\polygon\\(6 sides)};&
+    \node[regular polygon, regular polygon sides=8, align=center]
+      {regular\\polygon\\(8 sides)};\\
+    \node[trapezium] {trapezium};&
+    \node[cloud] {cloud};&
+    \node[star] {star};&
+    \node[starburst] {starburst};&
+    \\
+    \node[cylinder] {cylinder};&
+    \node[signal] {signal};&
+    \node[tape] {tape};&
+    \node[magnetic tape, align=center] {magnetic\\tape};&
+    \\
+    };
+\end{tikzpicture}`,
+        invalid: String.raw`\begin{tikzpicture}
+  \draw (0,0) .. (1,1);
+\end{tikzpicture}`
+      };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function renderPreview() {
+        try {
+          const svg = window.Tikz.renderToSvg(inputElement.value);
+          lastRenderedSvg = svg;
+          previewElement.innerHTML = svg;
+          statusElement.textContent = "Rendered successfully";
+          statusElement.dataset.state = "ok";
+          copySvgButton.disabled = false;
+          downloadSvgButton.disabled = false;
+          window.localStorage.setItem(storageKey, inputElement.value);
+        } catch (error) {
+          lastRenderedSvg = "";
+          previewElement.innerHTML = '<div class="errorBox"><strong>Tikz render error</strong><br>' + escapeHtml(error.message) + '</div>';
+          statusElement.textContent = "Render error";
+          statusElement.dataset.state = "error";
+          copySvgButton.disabled = true;
+          downloadSvgButton.disabled = true;
+          window.localStorage.setItem(storageKey, inputElement.value);
+        }
+      }
+
+      async function copySvg() {
+        if (!lastRenderedSvg) {
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(lastRenderedSvg);
+          statusElement.textContent = "SVG copied";
+          statusElement.dataset.state = "ok";
+        } catch (error) {
+          statusElement.textContent = "Clipboard unavailable";
+          statusElement.dataset.state = "error";
+        }
+      }
+
+      function downloadSvg() {
+        if (!lastRenderedSvg) {
+          return;
+        }
+
+        const blob = new Blob([lastRenderedSvg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "diagram.svg";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      for (const button of sampleButtons) {
+        button.addEventListener("click", function () {
+          const key = button.dataset.sample;
+          inputElement.value = samples[key];
+          renderPreview();
+          inputElement.focus();
+        });
+      }
+
+      copySvgButton.addEventListener("click", copySvg);
+      downloadSvgButton.addEventListener("click", downloadSvg);
+
+      const savedSource = window.localStorage.getItem(storageKey);
+      if (savedSource) {
+        inputElement.value = savedSource;
+      }
+
+      inputElement.addEventListener("input", renderPreview);
+      renderPreview();
+    </script>
+  </body>
+  </html>

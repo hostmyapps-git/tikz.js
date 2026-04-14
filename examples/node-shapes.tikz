@@ -1,0 +1,5 @@
+\begin{tikzpicture}
+  \node (r) at (0,1)   [draw, rectangle] {rectangle};
+  \node (c) at (1.5,0) [draw, circle]    {circle};
+  \node (e) at (3,1)   [draw, ellipse]   {ellipse};
+\end{tikzpicture}

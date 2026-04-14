@@ -1,0 +1,4 @@
+\begin{tikzpicture}
+  \draw[dashed, color=#1b9aaa, line width=0.05] (0,0) -- (1,1.4) -- (2.4,0.2);
+  \node[color=#0c4f59] at (1.2,1.9) {Route};
+\end{tikzpicture}

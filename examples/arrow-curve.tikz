@@ -1,0 +1,4 @@
+\begin{tikzpicture}
+  \draw[->, color=#7c3aed, line width=0.06] (0,0) .. controls (0.7,1.8) and (2.2,1.8) .. (3,0.3);
+  \node[color=#4c1d95] at (1.5,2.3) {Flow};
+\end{tikzpicture}

@@ -1,0 +1,4 @@
+\begin{tikzpicture}
+  \draw[line width=0.08, color=#3a6ea5] (0,0) -- (2,0) -- (1.5,1.5) -- (0.4,2.2) -- cycle;
+  \node[above, color=#17324d] at (1,2.2) {Facet};
+\end{tikzpicture}

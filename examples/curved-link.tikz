@@ -1,0 +1,4 @@
+\begin{tikzpicture}
+  \draw[<->, color=#dc2626, line width=0.05] (0,0.2) .. controls (1,1.6) and (2,1.6) .. (3,0.2);
+  \node[above, color=#7f1d1d] at (1.5,1.6) {Link};
+\end{tikzpicture}

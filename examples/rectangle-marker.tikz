@@ -1,0 +1,5 @@
+\begin{tikzpicture}
+  \draw[draw=#6b5b95, line width=0.06] (0,0) rectangle (3,2);
+  \fill[fill=#ff7f50, opacity=0.8] (1.5,1) circle (0.45);
+  \node[below, color=#3f2a1d] at (1.5,0) {Marker};
+\end{tikzpicture}

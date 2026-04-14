@@ -1,0 +1,31 @@
+{
+  "name": "tikz-js",
+  "version": "0.1.0",
+  "description": "Reference-driven TikZ to inline SVG renderer for the browser",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "tikz",
+    "svg",
+    "diagram",
+    "browser",
+    "latex"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "SUPPORTED_TIKZ.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "test": "node --test",
+    "test:latex": "node scripts/verify-latex.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3"
+  }
+}

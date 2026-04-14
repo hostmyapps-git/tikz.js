@@ -1,0 +1,17 @@
+\begin{tikzpicture}[every node/.style={font=\sffamily\small}]
+  \draw[thin,dotted] circle (1) circle (2) circle (3);
+  \draw[->] (-3,0) -- (3,0) node[right] {x};
+  \draw[->] (0,-3) -- (0,3) node[above] {y};
+  \foreach \x/\xlabel in {-2/{\minus 2\hphantom{-}}, -1/{\minus 1\hphantom{-}}, 1/1, 2/2}
+    \draw (\x cm,1pt ) -- (\x cm,-1pt ) node[anchor=north,fill=white] {\xlabel};
+  \foreach \y/\ylabel in {-2/{\minus 2}, -1/{\minus 1}, 1/1, 2/2}
+    \draw (1pt,\y cm) -- (-1pt ,\y cm) node[anchor=east, fill=white] {\ylabel};
+  \draw[fill=black] (60:2) circle (0.08)   node[below right] {(60:2)};
+  \draw [fill=blue!15](0,0) -- (1,0) arc (0:60:1cm);
+  \draw[fill=black] circle (0.08) node[above left] {(0:0)}
+    node [above right,xshift=0.2cm] {60${}^\circ$};
+  \draw [dashed](0,0) -- (60:2);
+  \draw [dashed](1,0) -- (60:2);
+  \draw[fill=black] (20:2) circle (0.08)   node[below right] {(20:2)};
+  \draw[fill=black] (180:3) circle (0.08)   node[above right] {(180:3)};
+\end{tikzpicture}
