@@ -3,7 +3,6 @@ import * as esbuild from "esbuild";
 const isWatchMode = process.argv.includes("--watch");
 
 const sharedOptions = {
-  entryPoints: ["src/index.js"],
   bundle: true,
   format: "iife",
   globalName: "Tikz",
@@ -13,36 +12,34 @@ const sharedOptions = {
   logLevel: "info"
 };
 
+const buildTargets = [
+  { entryPoint: "src/index.js", outfile: "dist/tikz.js", minify: false },
+  { entryPoint: "src/index.js", outfile: "dist/tikz.min.js", minify: true }
+];
+
 async function buildAll() {
   if (isWatchMode) {
-    const readableContext = await esbuild.context({
-      ...sharedOptions,
-      outfile: "dist/tikz.js",
-      minify: false
-    });
+    const contexts = await Promise.all(buildTargets.map((target) => {
+      return esbuild.context({
+        ...sharedOptions,
+        entryPoints: [target.entryPoint],
+        outfile: target.outfile,
+        minify: target.minify
+      });
+    }));
 
-    const minifiedContext = await esbuild.context({
-      ...sharedOptions,
-      outfile: "dist/tikz.min.js",
-      minify: true
-    });
-
-    await readableContext.watch();
-    await minifiedContext.watch();
+    await Promise.all(contexts.map((context) => context.watch()));
     return;
   }
 
-  await esbuild.build({
-    ...sharedOptions,
-    outfile: "dist/tikz.js",
-    minify: false
-  });
-
-  await esbuild.build({
-    ...sharedOptions,
-    outfile: "dist/tikz.min.js",
-    minify: true
-  });
+  await Promise.all(buildTargets.map((target) => {
+    return esbuild.build({
+      ...sharedOptions,
+      entryPoints: [target.entryPoint],
+      outfile: target.outfile,
+      minify: target.minify
+    });
+  }));
 }
 
 buildAll().catch((error) => {

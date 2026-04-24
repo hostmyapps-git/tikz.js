@@ -92,7 +92,7 @@ function buildLatexDocument(tikzSource) {
   return [
     "\\documentclass[tikz,border=2pt]{standalone}",
     "\\usepackage{tikz}",
-    "\\usetikzlibrary{matrix,quotes,shapes.geometric,shapes.misc,shapes.multipart,shapes.symbols}",
+    "\\usetikzlibrary{matrix,mindmap,quotes,shapes.geometric,shapes.misc,shapes.multipart,shapes.symbols}",
     "\\providecommand{\\minus}{\\raisebox{0.96pt}{-}}",
     "\\begin{document}",
     latexCompatibleSource,

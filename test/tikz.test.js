@@ -87,6 +87,16 @@ test("rejects unsupported shorthand curve syntax", () => {
   assert.throws(() => parse(source), /curves must use/);
 });
 
+test("keeps scope environments out of the stable profile", () => {
+  const source = String.raw`\begin{tikzpicture}
+  \begin{scope}[draw=red]
+    \draw (0,0) -- (1,1);
+  \end{scope}
+\end{tikzpicture}`;
+
+  assert.throws(() => parse(source), /unsupported command '\\begin\{scope\}\[draw=red\]'|scope environments are not supported/);
+});
+
 test("renders origin-centered circles and basic to-label edges", () => {
   const source = String.raw`\begin{tikzpicture}
 \draw circle(0.5);
@@ -345,6 +355,75 @@ test("supports drawing between named node anchors", () => {
   assert.match(svg, /<rect /);
   assert.match(svg, /<circle /);
   assert.match(svg, /<ellipse /);
+});
+
+test("keeps stable circle anchor demo rendering available", () => {
+  const svg = renderToSvg(readExample("circle-anchor-demo.tikz"));
+
+  assert.doesNotMatch(svg, /NaN/);
+  assert.match(svg, /<circle /);
+  assert.match(svg, /<tspan>\(n\.north west\)<\/tspan>/);
+  assert.match(svg, /<tspan>\(n\.mid east\)<\/tspan>/);
+});
+
+test("supports pragmatic stable-track mindmap trees", () => {
+  const source = readExample("mindmap-basics.tikz");
+  const ast = parse(source);
+
+  assert.equal(ast.commands.length, 1);
+  assert.equal(ast.commands[0].type, "mindmap");
+  assert.equal(ast.commands[0].root.text, "Root");
+  assert.equal(ast.commands[0].root.children.length, 3);
+  assert.equal(ast.commands[0].root.children[0].node.children.length, 2);
+
+  const svg = renderToSvg(source);
+  assert.match(svg, /<circle /);
+  assert.doesNotMatch(svg, /stroke-width="640"/);
+  assert.match(svg, /<tspan>Root<\/tspan>/);
+  assert.match(svg, /<tspan>Alpha<\/tspan>/);
+  assert.match(svg, /<tspan>A1<\/tspan>/);
+  assert.doesNotMatch(svg, /green!50!black/);
+  assert.match(svg, /linearGradient/);
+});
+
+test("supports root concept append style in stable mindmaps", () => {
+  const source = String.raw`\begin{tikzpicture}[
+    mindmap,
+    concept color=blue!50,
+    root concept/.append style={concept color=purple, minimum size=4cm},
+    text=white
+  ]
+    \path node[concept] {Root}
+      child[grow=0] { node[concept] {Child} };
+\end{tikzpicture}`;
+
+  const svg = renderToSvg(source);
+  assert.match(svg, /fill="purple"|fill="rgb\(/);
+  assert.match(svg, /<tspan>Child<\/tspan>/);
+});
+
+test("supports official-example-style mindmap grow directions", () => {
+  const source = String.raw`\begin{tikzpicture}[mindmap, concept color=red!50]
+  \node[concept] {Root concept}
+    child[grow=right] { node[concept] {Child concept} };
+\end{tikzpicture}`;
+
+  const svg = renderToSvg(source);
+  assert.match(svg, /<circle /);
+  assert.match(svg, /<tspan>Root concept<\/tspan>/);
+  assert.match(svg, /<tspan>Child concept<\/tspan>/);
+  assert.doesNotMatch(svg, /NaN/);
+});
+
+test("uses visible gradients for mindmap edges including deeper levels", () => {
+  const svg = renderToSvg(readExample("mindmap-basics.tikz"));
+
+  const gradientCount = (svg.match(/<linearGradient /g) || []).length;
+  const greenFillCount = (svg.match(/fill="rgb\(0, 128, 0\)"/g) || []).length;
+
+  assert.equal(gradientCount, 5);
+  assert.ok(greenFillCount >= 3);
+  assert.match(svg, /fill="url\(#tikz-linear-gradient-0\)"/);
 });
 
 test("supports node anchor demo with plot marks and named anchors", () => {

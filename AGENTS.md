@@ -46,6 +46,11 @@ Preferred workflow:
   - fidelity tuning third
 - Prefer exact geometry and anchor behavior before decorative fidelity.
 
+## Official TikZ documentation
+
+- https://texdoc.org/serve/tikz/0
+- https://tikz.dev/ (unofficial html implementation of the docs)
+
 ## Rendering Priorities
 
 When choosing what to improve next, prioritize in this order:

@@ -1,0 +1,129 @@
+h1. tikz.js
+
+_Render a focused TikZ subset as inline SVG directly in the browser._
+
+tikz.js is a small JavaScript library for turning TikZ source into inline SVG on the client side. It is built for simple browser usage: put TikZ code into HTML, load one script, and let the page render diagrams automatically.
+
+h2. Why tikz.js?
+
+* Browser-first workflow with inline SVG output
+* No runtime dependencies
+* Vanilla JavaScript implementation
+* Automatic rendering of elements with @class="tikz"@
+* Small, reference-driven scope instead of broad but fragile syntax coverage
+* Live playground for experimenting with TikZ snippets
+
+If you want Mermaid-style convenience for a practical subset of TikZ, tikz.js is the target.
+
+h2. How it works
+
+Include the bundled script and place TikZ code inside any block element with the @tikz@ class.
+
+bc.. <script src="/dist/tikz.min.js"></script>
+
+<div class="tikz">
+\begin{tikzpicture}
+  \draw (0,0) -- (2,0) -- (2,2) -- (0,2) -- cycle;
+  \fill[fill=red] (1,1) circle (0.3);
+  \node at (1,2.4) {Square};
+\end{tikzpicture}
+</div>
+
+The library renders @.tikz@ elements on @DOMContentLoaded@ and also exposes these browser APIs:
+
+* @Tikz.renderAll()@
+* @Tikz.renderElement(element)@
+* @Tikz.renderToSvg(source)@
+
+h2. Current feature set
+
+tikz.js currently focuses on a small but useful subset of TikZ.
+
+* @\draw@, @\fill@, and @\node@
+* Coordinates such as @(x,y)@, projected @(x,y,z)@, and polar forms like @(30:2)@
+* Paths with @--@, @rectangle@, @circle@, @ellipse@, @grid@, and @cycle@
+* Orthogonal connectors with @|-@ and @-|@
+* Cubic Bezier curves and supported arc forms
+* Arrow heads: @->@, @<-@, and @<->@
+* Named nodes and anchors like @(n.east)@ and @anchor=north@
+* Directional node placement such as @above right@
+* Styling with @draw=@, @fill=@, @text=@, @color=@, line widths, dash patterns, opacity, named colors, and hex colors
+* Simple @\foreach@ expansion, basic @\tikzset@ style expansion, and comment stripping
+
+h2. What it is good at
+
+tikz.js is a good fit for:
+
+* Documentation pages with embedded diagrams
+* Blog posts and notes that already use TikZ syntax
+* Lightweight educational or technical content
+* In-browser previews for a controlled TikZ subset
+
+The project grows from real examples and compares generated SVG against LaTeX/TikZ reference output where practical.
+
+h2. Known limits
+
+This is not a full TikZ implementation.
+
+* Full TeX macro expansion is not implemented
+* Text layout is browser and SVG based, not TeX exact
+* Matrix-heavy and decorative shapes are still evolving
+* Some supported shapes are currently approximate rather than fully faithful to LaTeX
+* Broad TikZ library coverage, scopes, transforms, and general style inheritance are still outside the current target
+
+That tradeoff is intentional: a smaller subset that behaves reliably is more useful than broad support with fragile rendering.
+
+h2. Demo and playground
+
+The repository includes two browser-facing pages:
+
+* @index.html@ for demo examples and visual reference comparisons
+* @editor.html@ for live editing, SVG copy, and SVG download
+
+The live editor also keeps the last source in local storage, which makes quick iteration easy.
+
+h2. Example diagrams
+
+Current demos cover examples such as:
+
+* Closed paths
+* Rectangles and circles
+* Dashed lines
+* Curved arrows
+* Bidirectional arcs
+* Orthogonal connectors
+* Circle edge labels
+* Axis and grid diagrams with anchors and point labels
+
+h2. Development status
+
+The project is currently at version @0.1.0@ and is being developed as a reference-driven browser renderer for TikZ to SVG.
+
+Core project characteristics:
+
+* MIT licensed
+* No runtime dependencies
+* Bundled browser builds in @dist/tikz.js@ and @dist/tikz.min.js@
+* Fast JavaScript regression tests plus optional LaTeX comparison checks
+
+h2. Getting started
+
+bc.. npm install
+npm run build
+npm test
+
+For fidelity checks against local LaTeX output:
+
+bc.. npm run test:latex
+
+h2. Project links
+
+* Source code: replace with your repository URL
+* Demo page: replace with your published demo URL
+* Playground: replace with your published editor URL
+* Compatibility notes: @SUPPORTED_TIKZ.md@
+* License: @LICENSE@
+
+h2. Summary
+
+tikz.js brings a practical TikZ subset to the browser with inline SVG output, a small footprint, and a workflow centered on concrete examples and reference-based verification. It is best suited to sites and tools that want the familiarity of TikZ without requiring a full LaTeX rendering pipeline.

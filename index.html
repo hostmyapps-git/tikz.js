@@ -47,6 +47,45 @@
         font-size: 18px;
       }
 
+      .cardHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .cardHeader h2 {
+        margin: 0;
+      }
+
+      .statusPill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .statusPill.supported {
+        background: #e7f7ec;
+        color: #166534;
+      }
+
+      .statusPill.experimental {
+        background: #fff3cd;
+        color: #92400e;
+      }
+
+      .statusPill.very-experimental {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
       .comparison {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -128,7 +167,7 @@
       <p>Any block element with <code>class="tikz"</code> is parsed on page load and replaced with inline SVG.</p>
 
       <div class="grid">
-        <section class="card" data-reference="closed-path">
+        <section class="card" data-reference="closed-path" data-status="supported">
           <h2>Closed Path</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -142,7 +181,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="rectangle-marker">
+        <section class="card" data-reference="rectangle-marker" data-status="supported">
           <h2>Rectangle And Circle</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -158,7 +197,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="dashed-line">
+        <section class="card" data-reference="dashed-line" data-status="supported">
           <h2>Dashed Line</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -172,7 +211,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="arrow-curve">
+        <section class="card" data-reference="arrow-curve" data-status="supported">
           <h2>Arrow Curve</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -186,7 +225,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="bidirectional-arc">
+        <section class="card" data-reference="bidirectional-arc" data-status="supported">
           <h2>Bidirectional Arc</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -200,7 +239,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="orthogonal-route">
+        <section class="card" data-reference="orthogonal-route" data-status="supported">
           <h2>Orthogonal Connector</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -214,7 +253,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="circle-label">
+        <section class="card" data-reference="circle-label" data-status="supported">
           <h2>Circle And Edge Label</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -228,7 +267,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="axis-labels">
+        <section class="card" data-reference="axis-labels" data-status="supported">
           <h2>Axis Labels</h2>
           <div class="tikz">
 \begin{tikzpicture}[every node/.style={font=\sffamily\small}]
@@ -258,7 +297,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="blue-square">
+        <section class="card" data-reference="blue-square" data-status="supported">
           <h2>Blue Square</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -278,7 +317,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="blue-circles">
+        <section class="card" data-reference="blue-circles" data-status="supported">
           <h2>Blue Circles</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -298,7 +337,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="polar-coordinates">
+        <section class="card" data-reference="polar-coordinates" data-status="supported">
           <h2>Polar Coordinates</h2>
           <div class="tikz">
 \begin{tikzpicture}[every node/.style={font=\sffamily\small}]
@@ -338,7 +377,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="polar-hexagon">
+        <section class="card" data-reference="polar-hexagon" data-status="supported">
           <h2>Polar Hexagon</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -358,7 +397,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="projected-axes">
+        <section class="card" data-reference="projected-axes" data-status="experimental">
           <h2>Projected Axes</h2>
           <div class="tikz">
 \begin{tikzpicture}[y={(-0.86cm,0.5cm)},x={(0.86cm,0.5cm)}, z={(0cm,1cm)},font=\sffamily]
@@ -378,7 +417,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="relative-plus">
+        <section class="card" data-reference="relative-plus" data-status="supported">
           <h2>Relative Plus</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -396,7 +435,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="relative-double-plus">
+        <section class="card" data-reference="relative-double-plus" data-status="supported">
           <h2>Relative Double Plus</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -414,7 +453,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="option-shapes">
+        <section class="card" data-reference="option-shapes" data-status="supported">
           <h2>Option Shapes</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -436,7 +475,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="filled-face">
+        <section class="card" data-reference="filled-face" data-status="supported">
           <h2>Filled Face</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -456,7 +495,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="shaded-face">
+        <section class="card" data-reference="shaded-face" data-status="experimental">
           <h2>Shaded Face</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -476,7 +515,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="styled-node">
+        <section class="card" data-reference="styled-node" data-status="experimental">
           <h2>Styled Node</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -488,7 +527,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="node-shapes">
+        <section class="card" data-reference="node-shapes" data-status="supported">
           <h2>Node Shapes</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -504,7 +543,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="node-connections">
+        <section class="card" data-reference="node-connections" data-status="supported">
           <h2>Node Connections</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -526,7 +565,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="anchored-node-placement">
+        <section class="card" data-reference="anchored-node-placement" data-status="experimental">
           <h2>Anchored Node Placement</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -542,7 +581,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="centered-node-placement">
+        <section class="card" data-reference="centered-node-placement" data-status="experimental">
           <h2>Centered Node Placement</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -556,7 +595,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="node-anchor-demo">
+        <section class="card" data-reference="node-anchor-demo" data-status="very-experimental">
           <h2>Node Anchor Demo</h2>
           <div class="tikz">
 \tikzset{shape example/.style = {
@@ -596,7 +635,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="circle-anchor-demo">
+        <section class="card" data-reference="circle-anchor-demo" data-status="very-experimental">
           <h2>Circle Anchor Demo</h2>
           <div class="tikz">
 \tikzset{shape example/.style = {
@@ -636,7 +675,7 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card">
+        <section class="card" data-status="experimental">
           <h2>Error State</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -648,7 +687,46 @@
 \end{tikzpicture}</pre>
         </section>
 
-        <section class="card" data-reference="matrix-shapes">
+        <section class="card" data-reference="mindmap-basics" data-status="very-experimental">
+          <h2>Mindmap Basics</h2>
+          <p><strong>Very experimental.</strong> Current mindmap rendering is still approximate and under active tuning.</p>
+          <div class="tikz">
+\begin{tikzpicture}[mindmap, concept color=blue!50, text=white]
+  \path
+    node[concept] {Root}
+    [clockwise from=0]
+    child[concept color=green!50!black, grow=20] {
+      node[concept] {Alpha}
+      child[grow=60] { node[concept] {A1} }
+      child[grow=-20] { node[concept] {A2} }
+    }
+    child[concept color=orange, grow=-35] {
+      node[concept] {Beta}
+    }
+    child[concept color=red, grow=-90] {
+      node[concept] {Gamma}
+    };
+\end{tikzpicture}
+          </div>
+          <pre>\begin{tikzpicture}[mindmap, concept color=blue!50, text=white]
+  \path
+    node[concept] {Root}
+    [clockwise from=0]
+    child[concept color=green!50!black, grow=20] {
+      node[concept] {Alpha}
+      child[grow=60] { node[concept] {A1} }
+      child[grow=-20] { node[concept] {A2} }
+    }
+    child[concept color=orange, grow=-35] {
+      node[concept] {Beta}
+    }
+    child[concept color=red, grow=-90] {
+      node[concept] {Gamma}
+    };
+\end{tikzpicture}</pre>
+        </section>
+
+        <section class="card" data-reference="matrix-shapes" data-status="very-experimental">
           <h2>Matrix Shapes</h2>
           <div class="tikz">
 \begin{tikzpicture}
@@ -726,6 +804,24 @@
 
     <script src="dist/tikz.js"></script>
     <script>
+      for (const card of document.querySelectorAll(".card[data-status]")) {
+        const title = card.querySelector("h2");
+        if (!title) {
+          continue;
+        }
+
+        const header = document.createElement("div");
+        header.className = "cardHeader";
+
+        const pill = document.createElement("span");
+        pill.className = "statusPill " + card.dataset.status;
+        pill.textContent = card.dataset.status.replace(/-/g, " ");
+
+        title.parentNode.insertBefore(header, title);
+        header.appendChild(title);
+        header.appendChild(pill);
+      }
+
       for (const card of document.querySelectorAll(".card[data-reference]")) {
         const tikzElement = card.querySelector(".tikz");
         if (!tikzElement) {

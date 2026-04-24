@@ -18,6 +18,21 @@ const COLOR_MIX_RGB = {
   white: [255, 255, 255],
   yellow: [255, 255, 0]
 };
+const XCOLOR_RGB = {
+  black: [0, 0, 0],
+  blue: [0, 0, 255],
+  brown: [191, 128, 64],
+  cyan: [0, 255, 255],
+  gray: [128, 128, 128],
+  grey: [128, 128, 128],
+  green: [0, 255, 0],
+  magenta: [255, 0, 255],
+  orange: [255, 128, 0],
+  purple: [191, 0, 191],
+  red: [255, 0, 0],
+  white: [255, 255, 255],
+  yellow: [255, 255, 0]
+};
 const NAMED_COLORS = new Set([
   "aliceblue",
   "antiquewhite",
@@ -458,161 +473,140 @@ function getNodeBoxMetrics(command) {
   const yPad = innerYSep !== null ? innerYSep * 2 * INNER_SEP_SCALE : null;
   const baseTextWidth = textWidthOption !== null ? Math.max(textWidthOption, textWidth) : textWidth;
 
+  let metrics;
+
   if (shape === "ellipse") {
-    return {
+    metrics = {
       width: baseTextWidth + (xPad !== null ? xPad : 0.52),
       height: textHeight + (yPad !== null ? yPad : 0.49)
     };
-  }
-
-  if (shape === "semicircle") {
+  } else if (shape === "semicircle") {
     const width = baseTextWidth * 0.62 + (xPad !== null ? xPad : 0.24);
     const minWidthForHeight = (textHeight + (yPad !== null ? yPad : 0.49)) * 2;
     const diameter = Math.max(width, minWidthForHeight);
-    return {
+    metrics = {
       width: diameter,
       height: diameter / 2
     };
-  }
-
-  if (shape === "circular sector") {
+  } else if (shape === "circular sector") {
     const width = baseTextWidth * 1.28 + (xPad !== null ? xPad : 0.42);
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.62), width * 0.92)
     };
-  }
-
-  if (shape === "dart") {
-    return {
+  } else if (shape === "dart") {
+    metrics = {
       width: baseTextWidth * 1.18 + (xPad !== null ? xPad : 0.34),
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.95), (baseTextWidth * 1.18 + (xPad !== null ? xPad : 0.34)) * 0.83)
     };
-  }
-
-  if (shape === "kite") {
+  } else if (shape === "kite") {
     const width = baseTextWidth * 0.9 + (xPad !== null ? xPad : 0.3);
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.55), width * 1.16)
     };
-  }
-
-  if (shape === "diamond") {
+  } else if (shape === "diamond") {
     const size = Math.max(
       baseTextWidth + (xPad !== null ? xPad : 0.28),
       textHeight + (yPad !== null ? yPad : 0.4)
     );
 
-    return {
+    metrics = {
       width: size,
       height: size
     };
-  }
-
-  if (shape === "isosceles triangle") {
+  } else if (shape === "isosceles triangle") {
     const width = baseTextWidth * 1.08 + (xPad !== null ? xPad : 0.34);
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.5), width * 0.9)
     };
-  }
-
-  if (shape === "trapezium") {
+  } else if (shape === "trapezium") {
     const width = baseTextWidth * 1.18 + (xPad !== null ? xPad : 0.34);
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.22), width * 0.26)
     };
-  }
-
-  if (shape === "tape") {
+  } else if (shape === "tape") {
     const width = baseTextWidth * 0.86 + (xPad !== null ? xPad : 0.24);
     const extraLines = Math.max(0, totalLineCount - 1);
     const multilinePadding = extraLines * 0.38;
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.46) + multilinePadding, width * (1.32 + extraLines * 0.16))
     };
-  }
-
-  if (shape === "magnetic tape") {
+  } else if (shape === "magnetic tape") {
     const size = Math.max(
       baseTextWidth * 1.22 + (xPad !== null ? xPad : 0.34),
       textHeight + (yPad !== null ? yPad : 0.46)
     );
-    return {
+    metrics = {
       width: size,
       height: size
     };
-  }
-
-  if (shape === "cylinder") {
+  } else if (shape === "cylinder") {
     const width = baseTextWidth * 1.05 + (xPad !== null ? xPad : 0.34);
-    return {
+    metrics = {
       width,
       height: textHeight + (yPad !== null ? yPad : 0.3)
     };
-  }
-
-  if (shape === "rectangle split") {
-    return {
+  } else if (shape === "rectangle split") {
+    metrics = {
       width: baseTextWidth * 0.62 + (xPad !== null ? xPad : 0.14),
       height: textHeight + (yPad !== null ? yPad : 0.18)
     };
-  }
-
-  if (shape === "circle split") {
+  } else if (shape === "circle split") {
     const width = baseTextWidth * 0.62 + (xPad !== null ? xPad : 0.14);
     const height = textHeight + (yPad !== null ? yPad : 0.18);
     const diameter = Math.max(width, height);
-    return {
+    metrics = {
       width: diameter,
       height: diameter
     };
-  }
-
-  if (shape === "circle") {
+  } else if (shape === "circle") {
     const width = baseTextWidth + (xPad !== null ? xPad : 0.18);
     const height = textHeight + (yPad !== null ? yPad : 0.14);
     const diameter = Math.max(width, height);
-    return {
+    metrics = {
       width: diameter,
       height: diameter
     };
-  }
-
-  if (shape === "forbidden sign") {
+  } else if (shape === "forbidden sign") {
     const width = baseTextWidth + (xPad !== null ? xPad : 0.28);
     const height = textHeight + (yPad !== null ? yPad : 0.28);
     const diameter = Math.max(width, height) * 0.82;
-    return {
+    metrics = {
       width: diameter,
       height: diameter
     };
-  }
-
-  if (["regular polygon", "star", "cloud"].includes(shape)) {
+  } else if (["regular polygon", "star", "cloud"].includes(shape)) {
     const width = baseTextWidth + (xPad !== null ? xPad : 0.28);
     const height = textHeight + (yPad !== null ? yPad : 0.28);
     const diameter = Math.max(width, height);
-    return {
+    metrics = {
       width: diameter,
       height: diameter
     };
-  }
-
-  if (shape === "starburst") {
+  } else if (shape === "starburst") {
     const width = baseTextWidth * 1.95 + (xPad !== null ? xPad : 0.36);
-    return {
+    metrics = {
       width,
       height: Math.max(textHeight + (yPad !== null ? yPad : 0.5), width * 0.48)
     };
+  } else {
+    metrics = {
+      width: baseTextWidth + (xPad !== null ? xPad : 0.18),
+      height: textHeight + (yPad !== null ? yPad : 0.28)
+    };
   }
 
+  const minimumSize = parseLength(options["minimum size"]) || 0;
+  const minimumWidth = parseLength(options["minimum width"]) || 0;
+  const minimumHeight = parseLength(options["minimum height"]) || 0;
+
   return {
-    width: baseTextWidth + (xPad !== null ? xPad : 0.18),
-    height: textHeight + (yPad !== null ? yPad : 0.28)
+    width: Math.max(metrics.width, minimumSize, minimumWidth),
+    height: Math.max(metrics.height, minimumSize, minimumHeight)
   };
 }
 
@@ -736,6 +730,424 @@ function expandMatrices(ast) {
   };
 }
 
+function splitTopLevelOptions(text, separator) {
+  const parts = [];
+  let start = 0;
+  let braceDepth = 0;
+  let bracketDepth = 0;
+  let parenDepth = 0;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (character === "{" && text[index - 1] !== "\\") {
+      braceDepth += 1;
+      continue;
+    }
+    if (character === "}" && text[index - 1] !== "\\") {
+      braceDepth -= 1;
+      continue;
+    }
+    if (character === "[") {
+      bracketDepth += 1;
+      continue;
+    }
+    if (character === "]") {
+      bracketDepth -= 1;
+      continue;
+    }
+    if (character === "(") {
+      parenDepth += 1;
+      continue;
+    }
+    if (character === ")") {
+      parenDepth -= 1;
+      continue;
+    }
+
+    if (character === separator && braceDepth === 0 && bracketDepth === 0 && parenDepth === 0) {
+      const part = text.slice(start, index).trim();
+      if (part) {
+        parts.push(part);
+      }
+      start = index + 1;
+    }
+  }
+
+  const trailing = text.slice(start).trim();
+  if (trailing) {
+    parts.push(trailing);
+  }
+
+  return parts;
+}
+
+function parseStyleOptionsText(text) {
+  const options = {};
+
+  for (const part of splitTopLevelOptions(text, ",")) {
+    const equalIndex = part.indexOf("=");
+    if (equalIndex === -1) {
+      options[part.trim()] = true;
+      continue;
+    }
+
+    const key = part.slice(0, equalIndex).trim();
+    const value = part.slice(equalIndex + 1).trim();
+    options[key] = value.startsWith("{") && value.endsWith("}") ? value.slice(1, -1).trim() : value;
+  }
+
+  return options;
+}
+
+function mergeOptionSets() {
+  return Array.from(arguments).reduce(function (result, options) {
+    return options ? { ...result, ...options } : result;
+  }, {});
+}
+
+function parseMindmapNumber(value, fallback) {
+  if (value === undefined || value === null || value === true) {
+    return fallback;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+  const namedAngles = {
+    right: 0,
+    east: 0,
+    up: 90,
+    north: 90,
+    left: 180,
+    west: 180,
+    down: -90,
+    south: -90
+  };
+
+  if (normalized in namedAngles) {
+    return namedAngles[normalized];
+  }
+
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function getMindmapScale(options) {
+  if (options["small mindmap"]) {
+    return 0.82;
+  }
+  if (options["large mindmap"]) {
+    return 1.3;
+  }
+  if (options["huge mindmap"]) {
+    return 1.6;
+  }
+  return 1;
+}
+
+function getMindmapLevelDefaults(level, scale) {
+  const sizes = [3.8, 2.15, 1.65, 1.2, 1.0, 0.9];
+  const distances = [0, 4.75, 2.75, 2.1, 1.7, 1.45];
+  const lineWidths = [0, 8, 5.5, 4, 3, 2.5];
+  const index = Math.min(level, sizes.length - 1);
+
+  return {
+    minimumSize: sizes[index] * scale,
+    distance: distances[index] * scale,
+    lineWidth: lineWidths[index]
+  };
+}
+
+function getMindmapStyleOptions(pictureOptions, level) {
+  const key = level === 0 ? "root concept/.append style" : "level " + level + " concept/.append style";
+  if (typeof pictureOptions[key] === "string") {
+    const value = pictureOptions[key].trim();
+    return parseStyleOptionsText(value.startsWith("{") && value.endsWith("}") ? value.slice(1, -1) : value);
+  }
+  return {};
+}
+
+function normalizeMindmapNode(node, point, options) {
+  return {
+    ...node,
+    point,
+    options,
+    mindmapConcept: true,
+    children: undefined
+  };
+}
+
+function buildMindmapNodeCommand(node, point, level, inheritedOptions, pictureOptions) {
+  const scale = getMindmapScale(pictureOptions);
+  const levelDefaults = getMindmapLevelDefaults(level, scale);
+  const levelStyleOptions = getMindmapStyleOptions(pictureOptions, level);
+  const mergedNodeOptions = mergeOptionSets(inheritedOptions, levelStyleOptions, node.options);
+  const conceptColor = mergedNodeOptions["concept color"] || inheritedOptions["concept color"] || pictureOptions["concept color"] || "blue!50";
+  const textColor = mergedNodeOptions.text || pictureOptions.text;
+  const effectiveMinimumSize = parseLength(mergedNodeOptions["minimum size"]) || levelDefaults.minimumSize;
+
+  return {
+    command: normalizeMindmapNode(node, point, {
+      ...mergedNodeOptions,
+      shape: mergedNodeOptions.shape || "circle",
+      draw: mergedNodeOptions.draw === true ? conceptColor : (mergedNodeOptions.draw || conceptColor),
+      fill: mergedNodeOptions.fill === true || mergedNodeOptions.fill === undefined ? conceptColor : mergedNodeOptions.fill,
+      ...(mergedNodeOptions["line width"] ? {} : { "line width": "0.9pt" }),
+      ...(mergedNodeOptions["minimum size"] ? {} : { "minimum size": effectiveMinimumSize + "cm" }),
+      ...(textColor ? { text: textColor } : {}),
+      ...(mergedNodeOptions["inner sep"] || mergedNodeOptions["inner xsep"] || mergedNodeOptions["inner ysep"]
+        ? {}
+        : {
+            "inner xsep": (effectiveMinimumSize * 0.24) + "cm",
+            "inner ysep": (effectiveMinimumSize * 0.2) + "cm"
+          })
+    }),
+    conceptColor,
+    levelDefaults,
+    levelStyleOptions
+  };
+}
+
+function getMindmapEdgeEndpoint(node, towardPoint) {
+  const center = getNodePoint(node);
+  const dx = towardPoint.x - center.x;
+  const dy = towardPoint.y - center.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const box = getNodeBoxMetrics(node);
+  const shape = getNodeShape(node);
+
+  if (shape === "circle") {
+    const radius = Math.max(box.width, box.height) / 2;
+    return {
+      x: center.x + dx / length * radius,
+      y: center.y + dy / length * radius
+    };
+  }
+
+  if (shape === "ellipse") {
+    const rx = box.width / 2;
+    const ry = box.height / 2;
+    const scale = 1 / Math.sqrt((dx * dx) / (rx * rx * length * length) + (dy * dy) / (ry * ry * length * length));
+    return {
+      x: center.x + dx / length * scale,
+      y: center.y + dy / length * scale
+    };
+  }
+
+  const scale = 1 / Math.max(Math.abs(dx) / (box.width / 2 * length), Math.abs(dy) / (box.height / 2 * length), 1 / length);
+  return {
+    x: center.x + dx / length * scale,
+    y: center.y + dy / length * scale
+  };
+}
+
+function getMindmapNodeRadius(node) {
+  const box = getNodeBoxMetrics(node);
+  const shape = getNodeShape(node);
+
+  if (shape === "ellipse") {
+    return Math.max(box.width, box.height) / 2;
+  }
+
+  return Math.max(box.width, box.height) / 2;
+}
+
+function rotateUnitVector(x, y, angle) {
+  return {
+    x: x * Math.cos(angle) - y * Math.sin(angle),
+    y: x * Math.sin(angle) + y * Math.cos(angle)
+  };
+}
+
+function interpolateUnitVectors(a, b, factor) {
+  const x = a.x * (1 - factor) + b.x * factor;
+  const y = a.y * (1 - factor) + b.y * factor;
+  const length = Math.hypot(x, y) || 1;
+  return { x: x / length, y: y / length };
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function buildMindmapEdgeCommand(parentNode, childNode, parentColor, childColor, usesGradient, options = {}) {
+  const parentCenter = getNodePoint(parentNode);
+  const childCenter = getNodePoint(childNode);
+  const dx = childCenter.x - parentCenter.x;
+  const dy = childCenter.y - parentCenter.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const parentRadius = getMindmapNodeRadius(parentNode);
+  const childRadius = getMindmapNodeRadius(childNode);
+  const ux = dx / length;
+  const uy = dy / length;
+  const xDirFlag = parentCenter.x > childCenter.x ? -1 : 1;
+  const yDirFlag = parentCenter.y > childCenter.y ? -1 : 1;
+  const m = dx === 0 ? Number.POSITIVE_INFINITY : (parentCenter.y - childCenter.y) / (parentCenter.x - childCenter.x);
+  const parentDockPointHeight = parentRadius / 2;
+  const childDockPointHeight = childRadius / 2;
+  const parentDockPointWidth = parentRadius / 5;
+  const childDockPointWidth = childRadius / 5;
+  const x1Gap = xDirFlag * (Number.isFinite(m)
+    ? Math.sqrt(Math.pow(parentRadius + parentDockPointHeight, 2) / (1 + m * m))
+    : 0);
+  const y1Gap = yDirFlag * (Number.isFinite(m)
+    ? yDirFlag * m * x1Gap
+    : (parentRadius + parentDockPointHeight));
+  const l1xGap = m === 0
+    ? 0
+    : (Number.isFinite(m)
+      ? Math.sqrt(Math.pow(parentDockPointWidth, 2) / (1 + 1 / (m * m)))
+      : parentDockPointWidth);
+  const l1yGap = m === 0 ? parentDockPointWidth : (Number.isFinite(m) ? (-1 / m) * l1xGap : 0);
+  const r1xGap = -l1xGap;
+  const r1yGap = m === 0 ? -parentDockPointWidth : (Number.isFinite(m) ? (-1 / m) * r1xGap : 0);
+  const x2Gap = -xDirFlag * (Number.isFinite(m)
+    ? Math.sqrt(Math.pow(childRadius + childDockPointHeight, 2) / (1 + m * m))
+    : 0);
+  const y2Gap = yDirFlag * (Number.isFinite(m)
+    ? yDirFlag * m * x2Gap
+    : -(childRadius + childDockPointHeight));
+  const l2xGap = m === 0
+    ? 0
+    : (Number.isFinite(m)
+      ? Math.sqrt(Math.pow(childDockPointWidth, 2) / (1 + 1 / (m * m)))
+      : childDockPointWidth);
+  const l2yGap = m === 0 ? childDockPointWidth : (Number.isFinite(m) ? (-1 / m) * l2xGap : 0);
+  const r2xGap = -l2xGap;
+  const r2yGap = m === 0 ? -childDockPointWidth : (Number.isFinite(m) ? (-1 / m) * r2xGap : 0);
+  const parentAlong = Number.isFinite(m)
+    ? Math.sqrt(Math.max(0, parentRadius * parentRadius - parentDockPointWidth * parentDockPointWidth))
+    : parentRadius;
+  const childAlong = Number.isFinite(m)
+    ? Math.sqrt(Math.max(0, childRadius * childRadius - childDockPointWidth * childDockPointWidth))
+    : childRadius;
+  const l1 = {
+    x: parentCenter.x - l1xGap + ux * parentAlong,
+    y: parentCenter.y - l1yGap + uy * parentAlong
+  };
+  const r1 = {
+    x: parentCenter.x - r1xGap + ux * parentAlong,
+    y: parentCenter.y - r1yGap + uy * parentAlong
+  };
+  const l2 = {
+    x: childCenter.x - l2xGap - ux * childAlong,
+    y: childCenter.y - l2yGap - uy * childAlong
+  };
+  const r2 = {
+    x: childCenter.x - r2xGap - ux * childAlong,
+    y: childCenter.y - r2yGap - uy * childAlong
+  };
+  const c1 = {
+    x: parentCenter.x + x1Gap,
+    y: parentCenter.y + y1Gap
+  };
+  const c2 = {
+    x: childCenter.x + x2Gap,
+    y: childCenter.y + y2Gap
+  };
+  const path = {
+    r1,
+    r2,
+    l1,
+    l2,
+    c1,
+    c2
+  };
+
+  return {
+    type: "mindmapedge",
+    options,
+    parentColor,
+    childColor,
+    usesGradient,
+    path
+  };
+}
+
+function layoutMindmapSubtree(node, point, level, inheritedOptions, pictureOptions, commands) {
+  const scale = getMindmapScale(pictureOptions);
+  const parentDescriptor = buildMindmapNodeCommand(node, point, level, inheritedOptions, pictureOptions);
+  const normalizedNode = parentDescriptor.command;
+  const conceptColor = parentDescriptor.conceptColor;
+  const levelDefaults = parentDescriptor.levelDefaults;
+  const levelStyleOptions = parentDescriptor.levelStyleOptions;
+
+  commands.push(normalizedNode);
+
+  if (!node.children || node.children.length === 0) {
+    return;
+  }
+
+  const parentLayoutOptions = mergeOptionSets(levelStyleOptions, node.options);
+  const siblingAngle = parseMindmapNumber(parentLayoutOptions["sibling angle"], level === 0 ? 60 : 50);
+  const clockwiseFrom = parseMindmapNumber(parentLayoutOptions["clockwise from"], 0);
+  const counterclockwiseFrom = parentLayoutOptions["counterclockwise from"] !== undefined
+    ? parseMindmapNumber(parentLayoutOptions["counterclockwise from"], 0)
+    : null;
+  const placedChildren = [];
+
+  for (const child of node.children) {
+    if (child.options.grow !== undefined) {
+      placedChildren.push({ child, angle: parseMindmapNumber(child.options.grow, 0) });
+      continue;
+    }
+
+    const index = placedChildren.length;
+    placedChildren.push({
+      child,
+      angle: counterclockwiseFrom !== null
+        ? counterclockwiseFrom + index * siblingAngle
+        : clockwiseFrom - index * siblingAngle
+    });
+  }
+
+  for (const entry of placedChildren) {
+    const childLevelDefaults = getMindmapLevelDefaults(level + 1, scale);
+    const radians = entry.angle * Math.PI / 180;
+    const childPoint = {
+      x: point.x + Math.cos(radians) * childLevelDefaults.distance,
+      y: point.y + Math.sin(radians) * childLevelDefaults.distance
+    };
+    const childOptions = mergeOptionSets(inheritedOptions, levelStyleOptions, entry.child.options);
+    const childDescriptor = buildMindmapNodeCommand(entry.child.node, childPoint, level + 1, {
+      ...childOptions,
+      "concept color": childOptions["concept color"] || conceptColor
+    }, pictureOptions);
+    const childConceptColor = childDescriptor.conceptColor;
+    commands.push(buildMindmapEdgeCommand(
+      normalizedNode,
+      childDescriptor.command,
+      conceptColor,
+      childConceptColor,
+      true,
+      { opacity: childOptions.opacity || 1, level: level + 1 }
+    ));
+
+    layoutMindmapSubtree(entry.child.node, childPoint, level + 1, {
+      ...childOptions,
+      "concept color": childConceptColor
+    }, pictureOptions, commands);
+  }
+}
+
+function expandMindmaps(ast) {
+  const commands = [];
+
+  for (const command of ast.commands) {
+    if (command.type !== "mindmap") {
+      commands.push(command);
+      continue;
+    }
+
+    const pictureOptions = ast.options || {};
+    layoutMindmapSubtree(command.root, command.root.point || { x: 0, y: 0 }, 0, mergeOptionSets(pictureOptions, command.options), pictureOptions, commands);
+  }
+
+  return {
+    ...ast,
+    commands
+  };
+}
+
 function parseLength(value) {
   const trimmed = String(value).trim();
   const match = trimmed.match(/^(-?(?:\d+(?:\.\d+)?|\.\d+))\s*(cm|pt)?$/);
@@ -805,6 +1217,10 @@ function wrapLinesToWidth(lines, maxWidth, fontSize) {
 
 function isNodeReference(point) {
   return Boolean(point && point.type === "nodeRef");
+}
+
+function isShiftedPoint(point) {
+  return Boolean(point && point.type === "shiftedPoint");
 }
 
 function buildNodeRegistry(ast) {
@@ -1043,6 +1459,14 @@ function getAnchorAnnotationLabelPoint(command) {
 }
 
 function resolvePoint(point, nodeRegistry) {
+  if (isShiftedPoint(point)) {
+    const basePoint = resolvePoint(point.basePoint, nodeRegistry);
+    return {
+      x: basePoint.x + point.offset.x,
+      y: basePoint.y + point.offset.y
+    };
+  }
+
   if (!isNodeReference(point)) {
     return point;
   }
@@ -1570,6 +1994,8 @@ function collectRenderPadding(ast) {
       if (style.stroke === "none" && style.fill === "none") {
         hasFreeLabels = true;
       }
+    } else if (command.type === "mindmapedge") {
+      maxLineWidth = Math.max(maxLineWidth, 0.9);
     } else {
       maxLineWidth = Math.max(maxLineWidth, resolveStyles(command).lineWidth);
       for (const operation of command.operations) {
@@ -1628,26 +2054,131 @@ function resolveColorValue(value) {
   }
 
   const trimmed = value.trim();
-  const mixMatch = trimmed.match(/^([a-z]+)!([0-9]{1,3})$/i);
-
-  if (mixMatch) {
-    const base = mixMatch[1].toLowerCase();
-    const percentage = Math.max(0, Math.min(100, Number.parseInt(mixMatch[2], 10)));
-    const rgb = COLOR_MIX_RGB[base];
-
-    if (rgb) {
-      const factor = percentage / 100;
-      return formatRgbColor(
-        Math.round(255 - (255 - rgb[0]) * factor),
-        Math.round(255 - (255 - rgb[1]) * factor),
-        Math.round(255 - (255 - rgb[2]) * factor)
-      );
+  if (trimmed.includes("!")) {
+    const mixed = resolveMixedColor(trimmed);
+    if (mixed) {
+      return formatRgbColor(mixed[0], mixed[1], mixed[2]);
     }
-
-    return base;
   }
 
   return trimmed;
+}
+
+function resolveColorForGradient(value) {
+  const mixed = resolveMixedColor(value);
+  if (mixed) {
+    return formatRgbColor(mixed[0], mixed[1], mixed[2]);
+  }
+
+  return resolveColorValue(value);
+}
+
+function resolveRgbComponents(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  const hexMatch = trimmed.match(/^#([0-9a-fA-F]{6})$/);
+  if (hexMatch) {
+    return [
+      Number.parseInt(hexMatch[1].slice(0, 2), 16),
+      Number.parseInt(hexMatch[1].slice(2, 4), 16),
+      Number.parseInt(hexMatch[1].slice(4, 6), 16)
+    ];
+  }
+
+  const rgbMatch = trimmed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  if (rgbMatch) {
+    return rgbMatch.slice(1).map(function (item) {
+      return Number.parseInt(item, 10);
+    });
+  }
+
+  const normalized = trimmed.toLowerCase();
+  const named = XCOLOR_RGB[normalized] || COLOR_MIX_RGB[normalized];
+  return named ? [...named] : null;
+}
+
+function mixRgbComponents(primary, percentage, secondary) {
+  const factor = percentage / 100;
+  return [0, 1, 2].map(function (index) {
+    return Math.round(primary[index] * factor + secondary[index] * (1 - factor));
+  });
+}
+
+function resolveMixedColor(value) {
+  if (!value.includes("!")) {
+    return resolveRgbComponents(value);
+  }
+
+  const parts = value.split("!").map(function (part) {
+    return part.trim();
+  }).filter(Boolean);
+
+  if (parts.length < 2) {
+    return resolveRgbComponents(value);
+  }
+
+  let current = resolveRgbComponents(parts[0]);
+  if (!current) {
+    return null;
+  }
+
+  let index = 1;
+  while (index < parts.length) {
+    const percentage = Math.max(0, Math.min(100, Number.parseFloat(parts[index])));
+    if (!Number.isFinite(percentage)) {
+      return null;
+    }
+
+    const nextColor = index + 1 < parts.length ? resolveRgbComponents(parts[index + 1]) : [255, 255, 255];
+    if (!nextColor) {
+      return null;
+    }
+
+    current = mixRgbComponents(current, percentage, nextColor);
+    index += 2;
+  }
+
+  return current;
+}
+
+function buildLinearGradient(definitions, start, end, startColor, endColor) {
+  const gradientId = "tikz-linear-gradient-" + definitions.length;
+  definitions.push(
+    '<linearGradient id="' + gradientId + '" gradientUnits="userSpaceOnUse" x1="' + start.x + '" y1="' + start.y + '" x2="' + end.x + '" y2="' + end.y + '">' +
+      '<stop offset="0%" stop-color="' + escapeXml(startColor) + '" />' +
+      '<stop offset="100%" stop-color="' + escapeXml(endColor) + '" />' +
+    '</linearGradient>'
+  );
+  return gradientId;
+}
+
+function renderMindmapEdgeCommand(command, bounds, definitions, padding) {
+  const style = resolveStyles({ type: "fill", options: { fill: command.childColor, opacity: command.options.opacity } });
+  const mapped = Object.fromEntries(Object.entries(command.path).map(function ([key, point]) {
+    return [key, mapCoordinate(bounds, point, padding)];
+  }));
+  const pathData = [
+    'M ' + mapped.r1.x + ' ' + mapped.r1.y,
+    'C ' + mapped.c1.x + ' ' + mapped.c1.y + ' ' + mapped.c2.x + ' ' + mapped.c2.y + ' ' + mapped.r2.x + ' ' + mapped.r2.y,
+    'L ' + mapped.l2.x + ' ' + mapped.l2.y,
+    'C ' + mapped.c2.x + ' ' + mapped.c2.y + ' ' + mapped.c1.x + ' ' + mapped.c1.y + ' ' + mapped.l1.x + ' ' + mapped.l1.y,
+    'Z'
+  ].join(' ');
+  const resolvedParentColor = resolveColorForGradient(command.parentColor);
+  const resolvedChildColor = resolveColorForGradient(command.childColor);
+  const fillValue = command.usesGradient
+    ? 'url(#' + buildLinearGradient(definitions, mapped.c1, mapped.c2, resolvedParentColor, resolvedChildColor) + ')'
+    : resolvedChildColor;
+
+  return '<path d="' + pathData + '" ' + renderStyleAttributes({
+    ...style,
+    stroke: 'none',
+    fill: fillValue,
+    lineWidth: 0
+  }) + ' />';
 }
 
 function lightenColor(color, amount) {
@@ -1712,7 +2243,7 @@ function darkenColor(color, amount) {
 
 function resolveLineWidth(options, fallback) {
   if (options["line width"]) {
-    const parsed = Number.parseFloat(options["line width"]);
+    const parsed = parseLength(options["line width"]);
     if (Number.isFinite(parsed)) {
       return parsed * UNIT_SCALE;
     }
@@ -1775,6 +2306,13 @@ function collectBounds(ast) {
         );
       }
       expandBounds(bounds, getCommandPadding(command));
+      continue;
+    }
+
+    if (command.type === "mindmapedge") {
+      for (const point of Object.values(command.path)) {
+        includePoint(bounds, point.x, point.y);
+      }
       continue;
     }
 
@@ -2062,7 +2600,7 @@ function renderArrowDefinitions() {
 }
 
 function commandUsesArrow(command) {
-  if (command.type === "node") {
+  if (command.type === "node" || command.type === "mindmapedge") {
     return false;
   }
 
@@ -2410,10 +2948,11 @@ function collectRenderedElementBounds(elementsMarkup) {
 }
 
 function render(ast) {
-  const expandedAst = expandMatrices(ast);
+  const expandedAst = expandMatrices(expandMindmaps(ast));
   const bounds = collectBounds(expandedAst);
   const padding = collectRenderPadding(expandedAst);
-  const elements = [];
+  const backgroundElements = [];
+  const foregroundElements = [];
   const definitions = [];
   const includeArrowDefinitions = expandedAst.commands.some(commandUsesArrow);
   const nodeRegistry = buildNodeRegistry(expandedAst);
@@ -2424,14 +2963,24 @@ function render(ast) {
 
   for (const command of expandedAst.commands) {
     if (command.type === "node") {
-      elements.push(renderNodeCommand(command, bounds, padding));
+      const element = renderNodeCommand(command, bounds, padding);
+      if (command.mindmapConcept) {
+        foregroundElements.push(element);
+      } else {
+        backgroundElements.push(element);
+      }
       continue;
     }
 
-    elements.push(renderPathCommand({ ...command, nodeRegistry }, bounds, ast.coordinateSystem, definitions, padding));
+    if (command.type === "mindmapedge") {
+      backgroundElements.push(renderMindmapEdgeCommand(command, bounds, definitions, padding));
+      continue;
+    }
+
+    backgroundElements.push(renderPathCommand({ ...command, nodeRegistry }, bounds, ast.coordinateSystem, definitions, padding));
   }
 
-  const content = elements.join("");
+  const content = backgroundElements.join("") + foregroundElements.join("");
   const renderedBounds = collectRenderedElementBounds(content);
   const outerMargin = Math.max(6, Math.min(padding.x, padding.y) * 0.5);
   const viewMinX = Math.floor(renderedBounds.minX - outerMargin);

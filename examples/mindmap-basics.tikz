@@ -1,0 +1,16 @@
+\begin{tikzpicture}[mindmap, concept color=blue!50, text=white]
+  \path
+    node[concept] {Root}
+    [clockwise from=0]
+    child[concept color=green!50!black, grow=20] {
+      node[concept] {Alpha}
+      child[grow=60] { node[concept] {A1} }
+      child[grow=-20] { node[concept] {A2} }
+    }
+    child[concept color=orange, grow=-35] {
+      node[concept] {Beta}
+    }
+    child[concept color=red, grow=-90] {
+      node[concept] {Gamma}
+    };
+\end{tikzpicture}

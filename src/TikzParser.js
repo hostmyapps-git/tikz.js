@@ -167,6 +167,21 @@ function mergeOptions(baseOptions, nextOptions) {
   };
 }
 
+function buildScopedDefaultNodeOptions(defaultNodeOptions, scopeOptions) {
+  let nextDefaults = { ...defaultNodeOptions };
+
+  if (scopeOptions.font) {
+    nextDefaults = mergeOptions(nextDefaults, { font: scopeOptions.font });
+  }
+
+  const everyNodeStyle = extractEveryNodeStyle(scopeOptions);
+  if (Object.keys(everyNodeStyle).length > 0) {
+    nextDefaults = mergeOptions(nextDefaults, everyNodeStyle);
+  }
+
+  return nextDefaults;
+}
+
 function extractTikzStyles(source) {
   const styles = {};
   let index = 0;
@@ -396,6 +411,14 @@ function buildCoordinateSystem(pictureOptions) {
   };
 }
 
+function buildScopedCoordinateSystem(baseCoordinateSystem, scopeOptions) {
+  return {
+    xBasis: scopeOptions.x ? parseBasisVector(scopeOptions.x) : baseCoordinateSystem.xBasis,
+    yBasis: scopeOptions.y ? parseBasisVector(scopeOptions.y) : baseCoordinateSystem.yBasis,
+    zBasis: scopeOptions.z ? parseBasisVector(scopeOptions.z) : baseCoordinateSystem.zBasis
+  };
+}
+
 function consumeDirectionalOptions(options) {
   const directionalKeys = ["above", "below", "left", "right"];
   const offset = { x: 0, y: 0 };
@@ -613,16 +636,16 @@ function splitMatrixRows(text) {
   return rows;
 }
 
-function parseMatrixCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+function parseMatrixCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions = {}) {
   const commandText = text.replace(/^\\matrix\s*/, "").trim();
   let remainder = commandText;
-  let matrixOptions = {};
-  let nodeDefaults = defaultNodeOptions;
+  let matrixOptions = inheritedOptions;
+  let nodeDefaults = mergeNodeOptions(inheritedOptions, defaultNodeOptions);
 
   if (remainder.startsWith("[")) {
     const balanced = readBalanced(remainder, 0, "[", "]");
     const parsed = parseMatrixOptions(balanced.value);
-    matrixOptions = parsed.options;
+    matrixOptions = mergeOptions(inheritedOptions, parsed.options);
     nodeDefaults = mergeNodeOptions(defaultNodeOptions, parsed.nodeDefaults);
     remainder = remainder.slice(balanced.endIndex + 1).trim();
   }
@@ -740,6 +763,40 @@ function applyNodeShift(point, options) {
   }
 
   return shiftedPoint;
+}
+
+function resolveShiftPoint(options, coordinateSystem) {
+  let shiftPoint = null;
+
+  if (typeof options.shift === "string") {
+    shiftPoint = parseCoordinateWithText(options.shift, coordinateSystem);
+  } else if (options.shiftPoint) {
+    shiftPoint = options.shiftPoint;
+  }
+
+  const xShift = typeof options.xshift === "string" ? parseNumber(options.xshift) : 0;
+  const yShift = typeof options.yshift === "string" ? parseNumber(options.yshift) : 0;
+
+  if (!shiftPoint && xShift === 0 && yShift === 0) {
+    return null;
+  }
+
+  if (shiftPoint && shiftPoint.type === "nodeRef") {
+    if (xShift === 0 && yShift === 0) {
+      return shiftPoint;
+    }
+
+    return {
+      type: "shiftedPoint",
+      basePoint: shiftPoint,
+      offset: { x: xShift, y: yShift }
+    };
+  }
+
+  return {
+    x: (shiftPoint ? shiftPoint.x : 0) + xShift,
+    y: (shiftPoint ? shiftPoint.y : 0) + yShift
+  };
 }
 
 function parseArcGroup(inner, currentPoint) {
@@ -1024,6 +1081,150 @@ function parsePlotOperation(tokens, startIndex, coordinateSystem) {
       points: parseCoordinateList(tokens[index + 1].value, coordinateSystem)
     },
     nextIndex: index + 2
+  };
+}
+
+function parseMindmapNodeBody(bodyText, defaultNodeOptions, coordinateSystem, styleRegistry) {
+  let remainder = bodyText.trim();
+  let name = null;
+
+  if (remainder.startsWith("node")) {
+    remainder = remainder.slice(4).trim();
+  }
+
+  if (remainder.startsWith("(")) {
+    const possibleName = readBalanced(remainder, 0, "(", ")");
+    if (!looksLikeCoordinateContent(possibleName.value)) {
+      name = possibleName.value.trim();
+      remainder = remainder.slice(possibleName.endIndex + 1).trim();
+    }
+  }
+
+  const leadingOptions = readOptionalOptions(remainder);
+  let options = mergeNodeOptions(defaultNodeOptions, expandStyleOptions(leadingOptions.options, styleRegistry));
+  if (!name && typeof options.name === "string") {
+    name = options.name.trim();
+  }
+  delete options.name;
+  remainder = leadingOptions.remainder;
+  let point = null;
+
+  if (remainder.startsWith("at")) {
+    remainder = remainder.slice(2).trim();
+    const positionData = readLeadingCoordinateWithSystem(remainder, "node position must be a coordinate", coordinateSystem);
+    point = positionData.point;
+    remainder = positionData.remainder;
+  } else if (remainder.startsWith("{")) {
+    point = { x: 0, y: 0 };
+  } else if (remainder.startsWith("(")) {
+    const positionData = readLeadingCoordinateWithSystem(remainder, "node syntax must use '(x,y)' or 'at (x,y)'", coordinateSystem);
+    point = positionData.point;
+    remainder = positionData.remainder;
+  } else {
+    point = { x: 0, y: 0 };
+  }
+
+  const trailingOptions = readOptionalOptions(remainder);
+  options = mergeNodeOptions(options, expandStyleOptions(trailingOptions.options, styleRegistry));
+  remainder = trailingOptions.remainder;
+  const placementAnchor = typeof options.anchor === "string" ? options.anchor.trim() : null;
+  delete options.anchor;
+  const directionData = consumeDirectionalOptions(options);
+
+  if (!remainder.startsWith("{")) {
+    throw createError("node text must be wrapped in braces");
+  }
+
+  const textResult = readBalanced(remainder, 0, "{", "}");
+  const rawText = textResult.value;
+  remainder = remainder.slice(textResult.endIndex + 1).trim();
+
+  const parsedNode = {
+    type: "node",
+    name,
+    options,
+    point: applyNodeShift(point, options),
+    anchor: directionData.activeDirections,
+    placementAnchor,
+    text: parseTextContent(rawText),
+    textLayoutHints: extractTextLayoutHints(rawText),
+    fontStyle: buildNodeFormatting(options, rawText, defaultNodeOptions)
+  };
+
+  return {
+    node: parsedNode,
+    remainder
+  };
+}
+
+function parseMindmapChild(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+  let remainder = text.trim();
+
+  if (!remainder.startsWith("child")) {
+    throw createError("expected child block");
+  }
+
+  remainder = remainder.slice(5).trim();
+  const childOptionsResult = readOptionalOptions(remainder);
+  const childOptions = expandStyleOptions(childOptionsResult.options, styleRegistry);
+  remainder = childOptionsResult.remainder;
+
+  if (!remainder.startsWith("{")) {
+    throw createError("child body must be wrapped in braces");
+  }
+
+  const childBody = readBalanced(remainder, 0, "{", "}");
+  const nodeData = parseMindmapNodeBody(childBody.value.trim(), defaultNodeOptions, coordinateSystem, styleRegistry);
+  const parsedChildren = parseMindmapChildren(nodeData.remainder, defaultNodeOptions, coordinateSystem, styleRegistry);
+
+  return {
+    child: {
+      options: childOptions,
+      node: {
+        ...nodeData.node,
+        children: parsedChildren.children
+      }
+    },
+    remainder: remainder.slice(childBody.endIndex + 1).trim()
+  };
+}
+
+function parseMindmapChildren(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+  const children = [];
+  let remainder = text.trim();
+
+  while (remainder.startsWith("child")) {
+    const childResult = parseMindmapChild(remainder, defaultNodeOptions, coordinateSystem, styleRegistry);
+    children.push(childResult.child);
+    remainder = childResult.remainder;
+  }
+
+  return {
+    children,
+    remainder
+  };
+}
+
+function parseMindmapPathCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+  const commandText = text.replace(/^\\path\s*/, "");
+  const parsed = readOptionalOptions(commandText);
+  const options = expandStyleOptions(parsed.options, styleRegistry);
+  const rootResult = parseMindmapNodeBody(parsed.remainder, defaultNodeOptions, coordinateSystem, styleRegistry);
+  const rootOptionsResult = readOptionalOptions(rootResult.remainder);
+  const childResult = parseMindmapChildren(rootOptionsResult.remainder, defaultNodeOptions, coordinateSystem, styleRegistry);
+
+  if (childResult.remainder && childResult.remainder !== ";") {
+    throw createError("unsupported path syntax near '" + childResult.remainder.split(/\s+/)[0] + "'");
+  }
+
+  return {
+    type: "mindmap",
+    options,
+    root: {
+      ...rootResult.node,
+      options: mergeNodeOptions(rootResult.node.options, expandStyleOptions(rootOptionsResult.options, styleRegistry)),
+      children: childResult.children
+    }
   };
 }
 
@@ -1393,107 +1594,232 @@ function parsePath(text, defaultNodeOptions = {}, coordinateSystem = DEFAULT_COO
   return operations;
 }
 
-function parseDrawLikeCommand(type, text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+function parseDrawLikeCommand(type, text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions = {}) {
   const commandText = text.replace(/^\\(draw|fill)\s*/, "");
   const parsed = readOptionalOptions(commandText);
-  const options = expandStyleOptions(parsed.options, styleRegistry);
+  const options = mergeOptions(inheritedOptions, expandStyleOptions(parsed.options, styleRegistry));
   const remainder = parsed.remainder;
 
-  if (typeof options.shift === "string") {
-    options.shiftPoint = parseCoordinateWithText(options.shift, coordinateSystem);
+  const shiftPoint = resolveShiftPoint(options, coordinateSystem);
+  if (shiftPoint) {
+    options.shiftPoint = shiftPoint;
   }
 
   return {
     type,
     options,
-    operations: parsePath(remainder, defaultNodeOptions, coordinateSystem)
+    operations: parsePath(remainder, mergeNodeOptions(inheritedOptions, defaultNodeOptions), coordinateSystem)
   };
 }
 
-function parseNodeCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
-  let remainder = text.replace(/^\\node\s*/, "").trim();
-  let name = null;
-
-  if (remainder.startsWith("(")) {
-    const possibleName = readBalanced(remainder, 0, "(", ")");
-    if (!looksLikeCoordinateContent(possibleName.value)) {
-      name = possibleName.value.trim();
-      remainder = remainder.slice(possibleName.endIndex + 1).trim();
-    }
-  }
-
-  const leadingOptions = readOptionalOptions(remainder);
-  let options = mergeNodeOptions(defaultNodeOptions, expandStyleOptions(leadingOptions.options, styleRegistry));
-  if (!name && typeof options.name === "string") {
-    name = options.name.trim();
-  }
-  delete options.name;
-  remainder = leadingOptions.remainder;
-  let point = null;
-
-  if (remainder.startsWith("at")) {
-    remainder = remainder.slice(2).trim();
-    const positionData = readLeadingCoordinateWithSystem(remainder, "node position must be a coordinate", coordinateSystem);
-    point = positionData.point;
-    remainder = positionData.remainder;
-  } else {
-    if (remainder.startsWith("{")) {
-      point = { x: 0, y: 0 };
-    } else {
-      const positionData = readLeadingCoordinateWithSystem(remainder, "node syntax must use '(x,y)' or 'at (x,y)'", coordinateSystem);
-      point = positionData.point;
-      remainder = positionData.remainder;
-    }
-  }
-
-  const trailingOptions = readOptionalOptions(remainder);
-  options = mergeNodeOptions(options, expandStyleOptions(trailingOptions.options, styleRegistry));
-  remainder = trailingOptions.remainder;
-  const placementAnchor = typeof options.anchor === "string" ? options.anchor.trim() : null;
-  delete options.anchor;
-  const directionData = consumeDirectionalOptions(options);
-
-  if (!remainder.startsWith("{")) {
-    throw createError("node text must be wrapped in braces");
-  }
-
-  const textResult = readBalanced(remainder, 0, "{", "}");
-  const rawText = textResult.value;
-
-  return {
-    type: "node",
-    name,
-    options,
-    point: applyNodeShift(point, options),
-    anchor: directionData.activeDirections,
-    placementAnchor,
-    text: parseTextContent(rawText),
-    textLayoutHints: extractTextLayoutHints(rawText),
-    fontStyle: buildNodeFormatting(options, rawText, defaultNodeOptions)
+function parseNodeCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions = {}) {
+  const nodeData = parseMindmapNodeBody(text.replace(/^\\node\s*/, "").trim(), mergeNodeOptions(inheritedOptions, defaultNodeOptions), coordinateSystem, styleRegistry);
+  const rootOptionsResult = readOptionalOptions(nodeData.remainder);
+  const normalizedNode = {
+    ...nodeData.node,
+    options: mergeNodeOptions(nodeData.node.options, expandStyleOptions(rootOptionsResult.options, styleRegistry))
   };
+  const childResult = parseMindmapChildren(rootOptionsResult.remainder, mergeNodeOptions(inheritedOptions, defaultNodeOptions), coordinateSystem, styleRegistry);
+
+  if (childResult.children.length > 0) {
+    if (childResult.remainder && childResult.remainder !== ";") {
+      throw createError("unsupported node syntax near '" + childResult.remainder.split(/\s+/)[0] + "'");
+    }
+
+    return {
+      type: "mindmap",
+      options: {},
+      root: {
+        ...normalizedNode,
+        children: childResult.children
+      }
+    };
+  }
+
+  if (childResult.remainder && childResult.remainder !== ";") {
+    throw createError("unsupported node syntax near '" + childResult.remainder.split(/\s+/)[0] + "'");
+  }
+
+  return normalizedNode;
 }
 
-function parseCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry) {
+function parseCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions = {}) {
   if (text.startsWith("\\draw")) {
-    return parseDrawLikeCommand("draw", text, defaultNodeOptions, coordinateSystem, styleRegistry);
+    return parseDrawLikeCommand("draw", text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions);
   }
 
   if (text.startsWith("\\fill")) {
-    return parseDrawLikeCommand("fill", text, defaultNodeOptions, coordinateSystem, styleRegistry);
+    return parseDrawLikeCommand("fill", text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions);
   }
 
   if (text.startsWith("\\node")) {
-    return parseNodeCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry);
+    return parseNodeCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions);
+  }
+
+  if (text.startsWith("\\path")) {
+    return parseMindmapPathCommand(text, mergeNodeOptions(inheritedOptions, defaultNodeOptions), coordinateSystem, styleRegistry);
   }
 
   if (text.startsWith("\\matrix")) {
-    return parseMatrixCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry);
+    return parseMatrixCommand(text, defaultNodeOptions, coordinateSystem, styleRegistry, inheritedOptions);
   }
 
   throw createError("unsupported command '" + text.split(/\s+/)[0] + "'");
 }
 
-function parse(source) {
+function readScopeBlock(text, startIndex) {
+  const scopeStart = "\\begin{scope}";
+  const scopeEnd = "\\end{scope}";
+
+  if (!text.startsWith(scopeStart, startIndex)) {
+    throw createError("expected \\begin{scope}");
+  }
+
+  let cursor = startIndex + scopeStart.length;
+  while (/\s/.test(text[cursor])) {
+    cursor += 1;
+  }
+
+  let options = {};
+  if (text[cursor] === "[") {
+    const balanced = readBalanced(text, cursor, "[", "]");
+    options = parseOptions(balanced.value);
+    cursor = balanced.endIndex + 1;
+  }
+
+  const bodyStart = cursor;
+  let depth = 0;
+  let searchIndex = cursor;
+
+  while (searchIndex < text.length) {
+    const nextScopeStart = text.indexOf(scopeStart, searchIndex);
+    const nextScopeEnd = text.indexOf(scopeEnd, searchIndex);
+
+    if (nextScopeEnd === -1) {
+      throw createError("missing \\end{scope}");
+    }
+
+    if (nextScopeStart !== -1 && nextScopeStart < nextScopeEnd) {
+      depth += 1;
+      searchIndex = nextScopeStart + scopeStart.length;
+      continue;
+    }
+
+    if (depth === 0) {
+      return {
+        options,
+        body: text.slice(bodyStart, nextScopeEnd).trim(),
+        endIndex: nextScopeEnd + scopeEnd.length
+      };
+    }
+
+    depth -= 1;
+    searchIndex = nextScopeEnd + scopeEnd.length;
+  }
+
+  throw createError("missing \\end{scope}");
+}
+
+function findCommandBoundary(text, startIndex) {
+  let braceDepth = 0;
+  let bracketDepth = 0;
+  let parenDepth = 0;
+
+  for (let index = startIndex; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (character === "{" && text[index - 1] !== "\\") {
+      braceDepth += 1;
+      continue;
+    }
+
+    if (character === "}" && text[index - 1] !== "\\") {
+      braceDepth -= 1;
+      continue;
+    }
+
+    if (character === "[") {
+      bracketDepth += 1;
+      continue;
+    }
+
+    if (character === "]") {
+      bracketDepth -= 1;
+      continue;
+    }
+
+    if (character === "(") {
+      parenDepth += 1;
+      continue;
+    }
+
+    if (character === ")") {
+      parenDepth -= 1;
+      continue;
+    }
+
+    if (character === ";" && braceDepth === 0 && bracketDepth === 0 && parenDepth === 0) {
+      return index;
+    }
+  }
+
+  return text.length;
+}
+
+function parseCommands(body, context) {
+  const commands = [];
+  let index = 0;
+
+  while (index < body.length) {
+    while (index < body.length && (/\s/.test(body[index]) || body[index] === ";")) {
+      index += 1;
+    }
+
+    if (index >= body.length) {
+      break;
+    }
+
+    if (body.startsWith("\\begin{scope}", index)) {
+      if (context.profile !== "complete") {
+        throw createError("scope environments are not supported");
+      }
+
+      const scopeBlock = readScopeBlock(body, index);
+      const scopeOptions = expandStyleOptions(scopeBlock.options, context.styleRegistry);
+      const inheritedOptions = mergeOptions(context.inheritedOptions, scopeOptions);
+      const coordinateSystem = buildScopedCoordinateSystem(context.coordinateSystem, scopeOptions);
+      const defaultNodeOptions = buildScopedDefaultNodeOptions(context.defaultNodeOptions, scopeOptions);
+
+      commands.push(...parseCommands(scopeBlock.body, {
+        ...context,
+        inheritedOptions,
+        coordinateSystem,
+        defaultNodeOptions
+      }));
+
+      index = scopeBlock.endIndex;
+      continue;
+    }
+
+    const boundary = findCommandBoundary(body, index);
+    const commandText = body.slice(index, boundary).trim();
+    if (commandText) {
+      commands.push(parseCommand(
+        commandText,
+        context.defaultNodeOptions,
+        context.coordinateSystem,
+        context.styleRegistry,
+        context.inheritedOptions
+      ));
+    }
+
+    index = boundary + 1;
+  }
+
+  return commands;
+}
+
+function parseStable(source) {
   const picture = extractPicture(source);
   const styleRegistry = extractTikzStyles(source);
   const coordinateSystem = buildCoordinateSystem(picture.options);
@@ -1508,9 +1834,15 @@ function parse(source) {
 
   return {
     type: "TikzPicture",
+    profile: "stable",
+    options: picture.options,
     coordinateSystem,
     commands
   };
+}
+
+function parse(source) {
+  return parseStable(source);
 }
 
 export { parse };

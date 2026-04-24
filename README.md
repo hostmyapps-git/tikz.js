@@ -1,7 +1,7 @@
 # tikz.js
 
-`tikz.js` is a small browser library that renders a focused TikZ subset into inline SVG.
-It is designed for simple browser usage: place TikZ source in HTML, load one script, and let the library render diagrams automatically.
+`tikz.js` is a browser library that renders a focused TikZ subset into inline SVG.
+It is intentionally reference-driven: prefer a small, solid subset over broad but fragile syntax coverage.
 
 ## Usage
 
@@ -141,7 +141,7 @@ Axis-style example:
 
 ## Limitations
 
-- this is still a focused subset, not a full TikZ implementation
+- `tikz.js` is intentionally a focused subset, not a full TikZ implementation
 - TeX macro expansion is not generally implemented
 - text layout is approximate and SVG/browser-font based rather than TeX-font based
 - LaTeX comparison is used as a verification aid, not as an exact rendering match

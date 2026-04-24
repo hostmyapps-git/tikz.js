@@ -209,6 +209,7 @@
               <button type="button" data-sample="centeredNode">Centered Node</button>
               <button type="button" data-sample="nodeAnchorDemo">Node Anchor Demo</button>
               <button type="button" data-sample="circleAnchorDemo">Circle Anchor Demo</button>
+              <button type="button" data-sample="mindmap">Mindmap</button>
               <button type="button" data-sample="matrixShapes">Matrix Shapes</button>
               <button type="button" data-sample="invalid">Invalid</button>
             </div>
@@ -408,6 +409,22 @@
       \draw[shift=(n.\anchor)] plot[mark=x] coordinates{(0,0)}
         node[\placement,label distance = 0mm,inner sep=3pt]
           {\scriptsize\texttt{(n.\anchor)}};
+\end{tikzpicture}`,
+        mindmap: String.raw`\begin{tikzpicture}[mindmap, concept color=blue!50, text=white]
+  \path
+    node[concept] {Root}
+    [clockwise from=0]
+    child[concept color=green!50!black, grow=20] {
+      node[concept] {Alpha}
+      child[grow=60] { node[concept] {A1} }
+      child[grow=-20] { node[concept] {A2} }
+    }
+    child[concept color=orange, grow=-35] {
+      node[concept] {Beta}
+    }
+    child[concept color=red, grow=-90] {
+      node[concept] {Gamma}
+    };
 \end{tikzpicture}`,
         matrixShapes: String.raw`\begin{tikzpicture}
     \matrix[nodes={draw, fill=blue!15},

@@ -18,5 +18,10 @@
     "file": "rectangle-marker.tikz",
     "name": "Rectangle Marker",
     "features": ["rectangle", "circle", "node-below"]
+  },
+  {
+    "file": "mindmap-basics.tikz",
+    "name": "Mindmap Basics",
+    "features": ["mindmap", "child-tree", "concept-color"]
   }
 ]

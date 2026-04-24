@@ -24,5 +24,6 @@
   { "file": "centered-node-placement.tikz", "name": "centered-node-placement", "aspectRatioTolerance": 1.2, "normalizedSizeTolerance": 1.2, "geometryOnly": false },
   { "file": "node-anchor-demo.tikz", "name": "node-anchor-demo", "aspectRatioTolerance": 10, "normalizedSizeTolerance": 10, "geometryOnly": false },
   { "file": "circle-anchor-demo.tikz", "name": "circle-anchor-demo", "aspectRatioTolerance": 10, "normalizedSizeTolerance": 10, "geometryOnly": false },
+  { "file": "mindmap-basics.tikz", "name": "mindmap-basics", "aspectRatioTolerance": 10, "normalizedSizeTolerance": 10, "geometryOnly": false },
   { "file": "matrix-shapes.tikz", "name": "matrix-shapes", "aspectRatioTolerance": 10, "normalizedSizeTolerance": 10, "geometryOnly": false }
 ]

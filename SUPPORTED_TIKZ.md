@@ -2,6 +2,8 @@
 
 This document is the user-facing compatibility guide for `tikz.js`.
 
+## Coverage
+
 Status meanings:
 
 - supported: intended to work for normal use
@@ -114,5 +116,5 @@ These may work for the current examples but should still be treated as evolving 
 ## Notes For Users
 
 - If a feature works in `index.html` and has a side-by-side LaTeX reference, that is usually the best indicator of current fidelity.
-- `editor.html` is useful for experimenting, but the more decorative or advanced a shape is, the more likely it is still approximate.
+- `editor.html` is useful for experimentation, but the more decorative or advanced a shape is, the more likely it is still approximate.
 - `npm run test:latex` and `artifacts/latex-verify/` are intended for fidelity inspection when developing or evaluating support.
